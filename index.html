@@ -446,14 +446,17 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
         <p class="sub" style="text-align:center">Simple. Secure. Made for you.</p>
 
         <div class="hero-illus">
-          <svg viewBox="0 0 320 150" style="width:100%;height:100%" preserveAspectRatio="xMidYMax meet">
-            <g fill="#9FB8F0" opacity=".9">
-              <path d="M0 150 L0 110 Q40 90 70 105 L75 60 L82 105 Q110 92 150 108 L150 70 L160 60 L170 70 L170 110 Q220 92 260 106 L264 70 L270 106 Q300 96 320 112 L320 150 Z"/>
-            </g>
-            <g stroke="#7E9DEB" stroke-width="3" fill="none" stroke-linecap="round">
-              <path d="M40 110 q4 -26 8 -40"/><path d="M48 70 q-9 4 -13 10 M48 70 q9 3 12 9 M48 70 q-3 -8 0 -14"/>
-            </g>
-            <rect x="150" y="58" width="10" height="52" fill="#6F90E5"/>
+          <svg viewBox="0 0 360 200" style="width:100%;height:100%" preserveAspectRatio="xMidYMid slice">
+            <defs>
+              <linearGradient id="hsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E7EFFB"/><stop offset="1" stop-color="#F4F8FD"/></linearGradient>
+              <linearGradient id="hsun" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#DCE7FA"/><stop offset="1" stop-color="#E8F0FC"/></linearGradient>
+            </defs>
+            <rect width="360" height="200" fill="url(#hsky)"/>
+            <circle cx="298" cy="50" r="30" fill="url(#hsun)"/>
+            <path d="M0 116 Q70 94 140 108 Q230 126 300 100 Q335 88 360 98 L360 200 0 200 Z" fill="#BACEEF"/>
+            <path d="M0 150 Q90 122 180 142 Q270 160 360 132 L360 200 0 200 Z" fill="#88A6E2"/>
+            <path d="M0 168 Q90 142 200 160 Q300 175 360 152 L360 200 0 200 Z" fill="#577ACF"/>
+            <path d="M0 168 Q90 142 200 160 Q300 175 360 152" stroke="#EDF2FF" stroke-width="2.5" fill="none" opacity=".6"/>
           </svg>
         </div>
 

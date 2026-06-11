@@ -1,0 +1,49 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#F3F6FC;display:grid;place-items:center;height:100vh}
+.box{width:340px;height:190px;border-radius:18px;overflow:hidden;background:linear-gradient(180deg,#E7EFFB,#F4F8FD)}</style></head>
+<body>
+<div class="box">
+<svg viewBox="0 0 360 200" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E7EFFB"/><stop offset="1" stop-color="#F4F8FD"/></linearGradient>
+    <linearGradient id="sun" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#DCE7FA"/><stop offset="1" stop-color="#E8F0FC"/></linearGradient>
+  </defs>
+  <rect width="360" height="200" fill="url(#sky)"/>
+  <circle cx="298" cy="50" r="30" fill="url(#sun)"/>
+  <!-- back hills (lightest) -->
+  <path d="M0 116 Q70 94 140 108 Q230 126 300 100 Q335 88 360 98 L360 200 0 200 Z" fill="#BACEEF"/>
+  <!-- mid hill -->
+  <path d="M0 150 Q90 122 180 142 Q270 160 360 132 L360 200 0 200 Z" fill="#88A6E2"/>
+  <!-- central monument (tower with dome) -->
+  <g fill="#36549F">
+    <rect x="150" y="88" width="9" height="56"/>
+    <path d="M150 88 Q154.5 77 159 88 Z"/>
+    <rect x="153.4" y="71" width="2.2" height="6"/>
+    <rect x="146" y="140" width="17" height="5"/>
+  </g>
+  <!-- citadelle fortress -->
+  <g fill="#36549F">
+    <path d="M196 144 L196 122 L210 108 L210 144 Z"/>
+    <path d="M210 144 L210 100 L214 100 L214 95 L219 95 L219 100 L224 100 L224 95 L229 95 L229 100 L234 100 L234 95 L239 95 L239 100 L244 100 L244 144 Z"/>
+    <rect x="240" y="110" width="22" height="34"/>
+    <path d="M240 110 L240 106 L243 106 L243 110 M247 110 L247 106 L250 106 L250 110 M254 110 L254 106 L257 106 L257 110"/>
+    <rect x="226" y="80" width="2.2" height="16"/>
+    <path d="M228 81 L237 84.5 L228 88 Z"/>
+  </g>
+  <!-- palm tree -->
+  <path d="M54 144 Q50 118 57 98" stroke="#36549F" stroke-width="4.2" fill="none" stroke-linecap="round"/>
+  <g stroke="#36549F" stroke-width="3.3" fill="none" stroke-linecap="round">
+    <path d="M57 97 Q38 92 24 101"/>
+    <path d="M57 97 Q42 83 30 83"/>
+    <path d="M57 97 Q50 77 46 65"/>
+    <path d="M57 97 Q57 76 57 63"/>
+    <path d="M57 97 Q64 77 68 65"/>
+    <path d="M57 97 Q72 83 84 83"/>
+    <path d="M57 97 Q76 92 90 101"/>
+  </g>
+  <g fill="#36549F"><circle cx="55" cy="101" r="2.4"/><circle cx="60" cy="102" r="2.4"/><circle cx="52" cy="104" r="2.2"/></g>
+  <!-- front dune -->
+  <path d="M0 168 Q90 142 200 160 Q300 175 360 152 L360 200 0 200 Z" fill="#577ACF"/>
+  <path d="M0 168 Q90 142 200 160 Q300 175 360 152" stroke="#EDF2FF" stroke-width="2.5" fill="none" opacity=".6"/>
+</svg>
+</div>
+</body></html>
