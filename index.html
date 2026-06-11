@@ -206,20 +206,20 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
 
 /* quick actions */
 .qa{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
-.qbtn{position:relative;overflow:hidden;background:linear-gradient(155deg,#3A63DE 0%,#1E40AB 55%,#15317F 100%);
-  color:#fff;border-radius:18px;padding:15px 8px 13px;display:flex;flex-direction:column;align-items:center;gap:9px;
-  font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:inherit;
-  box-shadow:0 12px 22px -13px rgba(20,46,122,.9), inset 0 1px 0 rgba(255,255,255,.22);
+/* quick actions — compact equal tiles, single 5-up row (no oversized/odd sizes) */
+.qa{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:14px}
+.qbtn{position:relative;overflow:hidden;background:linear-gradient(155deg,#3A63DE 0%,#1E40AB 60%,#15317F 100%);
+  color:#fff;border-radius:14px;padding:11px 2px 9px;display:flex;flex-direction:column;align-items:center;gap:6px;
+  font-size:9.5px;font-weight:600;cursor:pointer;border:none;font-family:inherit;
+  box-shadow:0 9px 18px -12px rgba(20,46,122,.85), inset 0 1px 0 rgba(255,255,255,.2);
   transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,filter .2s}
 .qbtn::before{content:"";position:absolute;inset:0 0 50% 0;
-  background:linear-gradient(180deg,rgba(255,255,255,.18),transparent);pointer-events:none}
-.qbtn::after{content:"";position:absolute;top:-30%;right:-20%;width:70%;height:120%;border-radius:50%;
-  background:radial-gradient(circle,rgba(255,255,255,.14),transparent 65%);pointer-events:none}
-.qbtn:active{transform:scale(.95);box-shadow:0 6px 14px -11px rgba(20,46,122,.95), inset 0 1px 0 rgba(255,255,255,.2);filter:brightness(.97)}
-.qbtn .qi{width:40px;height:40px;border-radius:13px;background:rgba(255,255,255,.17);
+  background:linear-gradient(180deg,rgba(255,255,255,.16),transparent);pointer-events:none}
+.qbtn:active{transform:scale(.94);filter:brightness(.97)}
+.qbtn .qi{width:32px;height:32px;border-radius:10px;background:rgba(255,255,255,.18);
   display:grid;place-items:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
-.qbtn .qi svg{width:21px;height:21px}
-.qbtn span.qt{position:relative;z-index:1;letter-spacing:.01em}
+.qbtn .qi svg{width:17px;height:17px}
+.qbtn span.qt{position:relative;z-index:1;letter-spacing:.005em;white-space:nowrap}
 
 /* services grid */
 .sgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
@@ -540,13 +540,11 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
         </div>
 
         <div class="qa">
-          <button class="qbtn" onclick="go('send')"><span class="qi"><svg viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="qt">Send Money</span></button>
+          <button class="qbtn" onclick="go('send')"><span class="qi"><svg viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="qt">Send</span></button>
           <button class="qbtn" onclick="go('topup')"><span class="qi"><svg viewBox="0 0 24 24" fill="none"><path d="M12 4v12m0 0l-4-4m4 4l4-4M5 20h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="qt">Receive</span></button>
-          <button class="qbtn" onclick="go('services')"><span class="qi"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="qt">Pay Bills</span></button>
-        </div>
-        <div class="qa" style="grid-template-columns:1fr 1fr;margin-top:10px">
+          <button class="qbtn" onclick="go('services')"><span class="qi"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="qt">Bills</span></button>
           <button class="qbtn" onclick="go('exchange')"><span class="qi"><svg viewBox="0 0 24 24" fill="none"><path d="M3 8h13l-3-3M21 16H8l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="qt">Exchange</span></button>
-          <button class="qbtn" onclick="go('topup')"><span class="qi"><svg viewBox="0 0 24 24" fill="none"><rect x="6" y="2" width="12" height="20" rx="2.5" stroke="currentColor" stroke-width="2"/><path d="M11 18h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="qt">Mobile Top Up</span></button>
+          <button class="qbtn" onclick="go('topup')"><span class="qi"><svg viewBox="0 0 24 24" fill="none"><rect x="6" y="2" width="12" height="20" rx="2.5" stroke="currentColor" stroke-width="2"/><path d="M11 18h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="qt">Top Up</span></button>
         </div>
 
         <div class="row between" style="margin-top:20px"><span style="font-weight:700;font-size:15px">Recent Transactions</span><span style="color:var(--blue);font-weight:600;font-size:13px;cursor:pointer" onclick="go('transactions')">View All</span></div>
