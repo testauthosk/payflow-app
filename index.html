@@ -176,11 +176,12 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
 .bitem.sel{color:var(--blue)}
 .bitem.sel:not(.scan) svg{transform:translateY(-2px) scale(1.06)}
 /* center Scan: pops above the bar via the button's own margin so the label stays aligned */
-.bitem.scan .scc{margin-top:-36px;width:58px;height:58px;border-radius:19px;border:3px solid #9AA4BC;
+.bitem.scan .scc{margin-top:-32px;width:54px;height:54px;border-radius:17px;position:relative;
   background:linear-gradient(150deg,#2A52C9 0%,#1B3FA6 100%);display:grid;place-items:center;color:#fff;
   box-shadow:0 14px 26px -10px rgba(27,63,166,.7), inset 0 1px 0 rgba(255,255,255,.22);
   transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
 .bitem.scan .scc svg{width:25px;height:25px}
+.bitem.scan .scc::after{content:'';position:absolute;inset:-3px;border-radius:20px;border:3px solid #EEF2FA;clip-path:inset(0 0 50% 0);pointer-events:none}
 .bitem.scan:active .scc{transform:scale(.92)}
 
 /* tap feedback — spring press on interactive surfaces */
