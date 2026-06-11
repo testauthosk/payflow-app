@@ -164,19 +164,22 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
 .search input{border:none;outline:none;font-family:inherit;font-size:14px;width:100%;background:none}
 
 /* bottom nav */
-.bnav{position:absolute;bottom:0;left:0;right:0;height:86px;background:#fff;
-  border-top:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-around;
-  padding:9px 8px env(safe-area-inset-bottom);z-index:55;box-shadow:0 -10px 30px -18px rgba(20,46,122,.3)}
-.bitem{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10.5px;font-weight:600;
-  color:#9AA4BC;cursor:pointer;flex:1;padding-top:6px;transition:color .25s ease}
-.bitem svg{width:23px;height:23px;transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+/* bottom nav: full-width bar, elevated center Scan, labels aligned at one baseline */
+.bnav{position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+  display:flex;align-items:flex-end;justify-content:space-around;
+  padding:10px 6px calc(12px + env(safe-area-inset-bottom));z-index:55;
+  box-shadow:0 -12px 32px -20px rgba(20,46,122,.32)}
+.bitem{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10px;font-weight:600;
+  color:#9AA4BC;cursor:pointer;flex:1;transition:color .25s ease}
+.bitem svg{width:22px;height:22px;transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
 .bitem.sel{color:var(--blue)}
-.bitem.sel:not(.scan) svg{transform:translateY(-3px) scale(1.08)}
-.bitem.scan{margin-top:-22px}
-.bitem.scan .scc{width:56px;height:56px;border-radius:18px;background:var(--blue-bright);
-  display:grid;place-items:center;color:#fff;box-shadow:0 12px 24px -8px rgba(37,99,235,.7);
+.bitem.sel:not(.scan) svg{transform:translateY(-2px) scale(1.06)}
+/* center Scan: pops above the bar via the button's own margin so the label stays aligned */
+.bitem.scan .scc{margin-top:-26px;width:54px;height:54px;border-radius:17px;
+  background:linear-gradient(150deg,#2A52C9 0%,#1B3FA6 100%);display:grid;place-items:center;color:#fff;
+  box-shadow:0 14px 26px -10px rgba(27,63,166,.7), inset 0 1px 0 rgba(255,255,255,.22);
   transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
-.bitem.scan .scc svg{width:26px;height:26px}
+.bitem.scan .scc svg{width:25px;height:25px}
 .bitem.scan:active .scc{transform:scale(.92)}
 
 /* tap feedback — spring press on interactive surfaces */
