@@ -65,7 +65,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
 /* dim overlay used during slide parallax */
 .screen::after{content:"";position:fixed;inset:0;background:#0b1430;opacity:0;pointer-events:none;
   transition:opacity .42s cubic-bezier(.32,.72,0,1);z-index:40}
-.screen.dimmed::after{opacity:.16}
+.screen.dimmed::after{opacity:.1}
 /* content enter: gentle stagger of marked blocks */
 .enter > [data-rise]{opacity:0;transform:translateY(14px)}
 .enter.run > [data-rise]{opacity:1;transform:none;
@@ -368,11 +368,12 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
 .sheet-wrap.open{visibility:visible;transition:visibility 0s linear 0s}
 .sheet-bg{position:absolute;inset:0;background:rgba(9,14,30,.45);opacity:0;transition:opacity .5s ease}
 .sheet-wrap.open .sheet-bg{opacity:1}
-.sheet{position:absolute;left:0;right:0;bottom:0;max-height:82%;display:flex;flex-direction:column;overflow:hidden;
+.sheet{position:absolute;left:0;right:0;bottom:0;top:5%;display:flex;flex-direction:column;overflow:hidden;
   background:var(--bg);border-radius:24px 24px 0 0;box-shadow:0 -16px 44px -18px rgba(9,14,30,.4);
-  transform:translateY(101%);transition:transform .55s cubic-bezier(.16,1,.3,1)}
+  transform:translateY(101%);transition:transform .5s cubic-bezier(.16,1,.3,1);will-change:transform}
 .sheet-wrap.open .sheet{transform:translateY(0)}
-.sheet-grip{flex-shrink:0;padding:10px 20px 0}
+.sheet.dragging{transition:none}
+.sheet-grip{flex-shrink:0;padding:12px 20px 2px;touch-action:none;cursor:grab}
 .sheet-handle{width:40px;height:5px;border-radius:100px;background:#CBD6EE;margin:0 auto 12px}
 .sheet-head{display:flex;align-items:center;justify-content:space-between;padding:0 20px 12px}
 .sheet-head h3{font-weight:800;font-size:19px;color:var(--ink)}
@@ -389,6 +390,24 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
 .notif .nb .nt{font-weight:600;font-size:14px;color:var(--ink-2)}
 .notif .nb .ns{font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.4}
 .notif .ntime{font-size:11px;color:var(--muted);white-space:nowrap;flex:none}
+.notif.tap{cursor:pointer;transition:background .18s;margin:0 -10px;padding-left:10px;padding-right:10px;border-radius:12px}
+.notif.tap:active{background:var(--soft)}
+.notif .chev{flex:none;color:#C2CCE2;align-self:center}
+/* notification detail pane (slides in over the list) */
+.notif-detail{position:absolute;inset:0;background:var(--bg);border-radius:24px 24px 0 0;z-index:2;
+  display:flex;flex-direction:column;transform:translateX(100%);transition:transform .38s cubic-bezier(.4,0,.2,1)}
+.sheet-wrap.detail .notif-detail{transform:translateX(0)}
+.nd-head{display:flex;align-items:center;gap:10px;padding:8px 20px 6px}
+.nd-head .bk{width:36px;height:36px;border-radius:12px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;cursor:pointer;color:var(--ink)}
+.nd-head .bk svg{width:18px;height:18px}
+.nd-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:10px 24px calc(24px + env(safe-area-inset-bottom))}
+.nd-ic{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:var(--soft);color:var(--blue);margin:4px 0 16px}
+.nd-ic svg{width:26px;height:26px}
+.nd-ic.green{background:var(--green-bg);color:var(--green)}
+.nd-ic.amber{background:#FFF4E0;color:#C98113}
+.nd-time{font-size:12px;color:var(--muted)}
+.nd-title{font-size:21px;font-weight:800;color:var(--ink);margin:6px 0 12px;line-height:1.25}
+.nd-body{font-size:14.5px;color:var(--ink-2);line-height:1.65}
 </style>
 </head>
 <body>
@@ -664,8 +683,16 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
     <!-- ============ 8. SERVICES ============ -->
     <section class="screen has-nav" data-screen="services">
       <div class="pad" style="padding-top:6px">
-        <div class="row between"><div><div class="h-title" style="font-size:1.3rem">Services</div><div class="sub">Pay for what matters, easily.</div></div>
-          <div class="iconbtn" style="position:relative" onclick="openNotif()"><svg viewBox="0 0 24 24" fill="none"><path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8z" stroke="currentColor" stroke-width="1.8"/><path d="M10 21a2 2 0 004 0" stroke="currentColor" stroke-width="1.8"/></svg><span class="reddot"></span></div>
+        <div class="row between"><div><div class="h-title" style="font-size:1.3rem">More</div><div class="sub">Services, account &amp; settings.</div></div>
+          <div class="row" style="gap:8px">
+            <div class="iconbtn" onclick="go('settings')"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/><path d="M19 12a7 7 0 00-.1-1l2-1.5-2-3.4-2.3 1a7 7 0 00-1.7-1l-.3-2.6H10l-.3 2.6a7 7 0 00-1.7 1l-2.3-1-2 3.4L5.7 11a7 7 0 000 2l-2 1.5 2 3.4 2.3-1a7 7 0 001.7 1l.3 2.6h3.6l.3-2.6a7 7 0 001.7-1l2.3 1 2-3.4-2-1.5a7 7 0 00.1-1z" stroke="currentColor" stroke-width="1.6"/></svg></div>
+            <div class="iconbtn" style="position:relative" onclick="openNotif()"><svg viewBox="0 0 24 24" fill="none"><path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8z" stroke="currentColor" stroke-width="1.8"/><path d="M10 21a2 2 0 004 0" stroke="currentColor" stroke-width="1.8"/></svg><span class="reddot"></span></div>
+          </div>
+        </div>
+        <!-- account + settings entries (findable from More tab) -->
+        <div class="card" style="padding:4px 16px;margin-top:14px">
+          <div class="lrow tap" onclick="go('profile')"><div class="av" style="width:38px;height:38px;display:grid;place-items:center;font-weight:700;font-size:13px;color:#3a59b8;background:#D9E3FA">JL</div><div class="lmain"><div class="t">Jean-Baptiste Louis</div><div class="s">View profile &amp; account</div></div><svg viewBox="0 0 24 24" fill="none" style="width:18px;color:var(--muted)"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2"/></svg></div>
+          <div class="lrow tap" onclick="go('settings')"><div class="licon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/><path d="M19 12a7 7 0 00-.1-1l2-1.5-2-3.4-2.3 1a7 7 0 00-1.7-1l-.3-2.6H10l-.3 2.6a7 7 0 00-1.7 1l-2.3-1-2 3.4L5.7 11a7 7 0 000 2l-2 1.5 2 3.4 2.3-1a7 7 0 001.7 1l.3 2.6h3.6l.3-2.6a7 7 0 001.7-1l2.3 1 2-3.4-2-1.5a7 7 0 00.1-1z" stroke="currentColor" stroke-width="1.6"/></svg></div><div class="lmain"><div class="t">Settings &amp; Security</div><div class="s">Password, PIN, 2FA, biometrics, language</div></div><svg viewBox="0 0 24 24" fill="none" style="width:18px;color:var(--muted)"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2"/></svg></div>
         </div>
         <div class="search" style="margin-top:14px"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input placeholder="Search services"></div>
         <div class="sgrid">
@@ -824,7 +851,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
     <nav class="bnav" id="bnav" style="display:none">
       <div class="bitem" data-tab="home" onclick="navTab('home')"><svg viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7M5 10v10h5v-6h4v6h5V10" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Home</div>
       <div class="bitem" data-tab="transactions" onclick="navTab('transactions')"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M3 9h18" stroke="currentColor" stroke-width="2"/></svg>Accounts</div>
-      <div class="bitem scan" data-tab="qr" onclick="go('qr','push')"><span class="scc"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7V5a1 1 0 011-1h2M4 17v2a1 1 0 001 1h2M20 7V5a1 1 0 00-1-1h-2M20 17v2a1 1 0 01-1 1h-2M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>Scan</div>
+      <div class="bitem scan" data-tab="qr" onclick="go('qr','tabL')"><span class="scc"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7V5a1 1 0 011-1h2M4 17v2a1 1 0 001 1h2M20 7V5a1 1 0 00-1-1h-2M20 17v2a1 1 0 01-1 1h-2M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>Scan</div>
       <div class="bitem" data-tab="cards" onclick="navTab('cards')"><svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M2 10h20M6 15h4" stroke="currentColor" stroke-width="2"/></svg>Cards</div>
       <div class="bitem" data-tab="services" onclick="navTab('services')"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>More</div>
     </nav>
@@ -862,15 +889,21 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
     <div class="sheet-wrap" id="notifSheet">
       <div class="sheet-bg" onclick="closeNotif()"></div>
       <div class="sheet">
-        <div class="sheet-grip"><div class="sheet-handle"></div></div>
+        <div class="sheet-grip" id="notifGrip"><div class="sheet-handle"></div></div>
         <div class="sheet-head"><h3>Notifications</h3><button class="sheet-x" onclick="closeNotif()" aria-label="Close">&times;</button></div>
         <div class="sheet-scroll">
-          <div class="notif green"><div class="nic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 4v12m0 0l-4-4m4 4l4-4M5 20h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="nb"><div class="nt">Money received</div><div class="ns">Marie Pierre sent you 3,000 HTG.</div></div><div class="ntime">2m</div></div>
-          <div class="notif"><div class="nic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="1.8"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="nb"><div class="nt">New sign-in to your account</div><div class="ns">Face ID login from your iPhone. If this wasn't you, secure your account.</div></div><div class="ntime">1h</div></div>
-          <div class="notif green"><div class="nic"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="nb"><div class="nt">Top-up confirmed</div><div class="ns">2,000 HTG added to your HTG balance.</div></div><div class="ntime">3h</div></div>
-          <div class="notif amber"><div class="nic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="nb"><div class="nt">Government Fee needs attention</div><div class="ns">A payment of 2,000 HTG requires your confirmation.</div></div><div class="ntime">1d</div></div>
-          <div class="notif"><div class="nic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1 3-6z"/></svg></div><div class="nb"><div class="nt">You earned 12 HTG cashback</div><div class="ns">Rewards from your recent card payments.</div></div><div class="ntime">2d</div></div>
-          <div class="notif green"><div class="nic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="1.8"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="nb"><div class="nt">Identity verified</div><div class="ns">Your KYC is approved — limits increased.</div></div><div class="ntime">5d</div></div>
+          <div class="notif green tap" onclick="openNotifDetail(this)" data-full="Marie Pierre sent you 3,000 HTG to your HTG balance. The funds are available immediately and the transfer reference is PF-5294-0042. You can view this transaction any time under Card Transactions."><div class="nic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 4v12m0 0l-4-4m4 4l4-4M5 20h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="nb"><div class="nt">Money received</div><div class="ns">Marie Pierre sent you 3,000 HTG.</div></div><div class="ntime">2m</div><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2"/></svg></div>
+          <div class="notif tap" onclick="openNotifDetail(this)" data-full="A new Face ID sign-in was detected on your iPhone at 9:41 AM. If this was you, no action is needed. If you don't recognise this activity, open Settings &rarr; Security and change your PIN immediately, then contact support."><div class="nic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="1.8"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="nb"><div class="nt">New sign-in to your account</div><div class="ns">Face ID login from your iPhone. If this wasn't you, secure your account.</div></div><div class="ntime">1h</div><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2"/></svg></div>
+          <div class="notif green tap" onclick="openNotifDetail(this)" data-full="Your top-up of 2,000 HTG has been confirmed and added to your HTG balance. The funding method was your linked Visa card ending 4582. Your new balance is now reflected on the home screen."><div class="nic"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="nb"><div class="nt">Top-up confirmed</div><div class="ns">2,000 HTG added to your HTG balance.</div></div><div class="ntime">3h</div><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2"/></svg></div>
+          <div class="notif amber tap" onclick="openNotifDetail(this)" data-full="A Government Fee payment of 2,000 HTG requires your confirmation before it can be processed. Please review the details and confirm or decline. If no action is taken within 7 days, the request will expire automatically."><div class="nic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 9v4m0 4h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="nb"><div class="nt">Government Fee needs attention</div><div class="ns">A payment of 2,000 HTG requires your confirmation.</div></div><div class="ntime">1d</div><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2"/></svg></div>
+          <div class="notif tap" onclick="openNotifDetail(this)" data-full="You earned 12 HTG in cashback rewards from your recent card payments. Rewards are credited to your account monthly. Keep paying with PayFlow to earn cashback on eligible transactions."><div class="nic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1 3-6z"/></svg></div><div class="nb"><div class="nt">You earned 12 HTG cashback</div><div class="ns">Rewards from your recent card payments.</div></div><div class="ntime">2d</div><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2"/></svg></div>
+          <div class="notif green tap" onclick="openNotifDetail(this)" data-full="Your identity has been successfully verified (KYC approved). Your account limits have been increased and you now have full access to all PayFlow features, including higher transfer limits and additional cards."><div class="nic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="1.8"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="nb"><div class="nt">Identity verified</div><div class="ns">Your KYC is approved — limits increased.</div></div><div class="ntime">5d</div><svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2"/></svg></div>
+        </div>
+        <!-- detail pane (slides in on tap) -->
+        <div class="notif-detail">
+          <div class="sheet-grip"><div class="sheet-handle"></div></div>
+          <div class="nd-head"><div class="bk" onclick="closeNotifDetail()"><svg viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div style="font-weight:700;font-size:15px">Notification</div></div>
+          <div class="nd-scroll" id="notifDetailBody"></div>
         </div>
       </div>
     </div>
@@ -885,7 +918,7 @@ let stack = ['welcome'];
 let current = 'welcome';
 let animating = false;
 const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
-const EASE = 'cubic-bezier(.32,.72,0,1)', DUR = 430;
+const EASE = 'cubic-bezier(.4,0,.2,1)', DUR = 420;
 
 function el(name){ return document.querySelector('[data-screen="'+name+'"]'); }
 function setChrome(name){
@@ -1073,9 +1106,40 @@ function faceID(){
 function tick(){const d=new Date();document.getElementById('clock').textContent=d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');}
 tick();setInterval(tick,30000);
 
-// notifications bottom sheet
+// notifications bottom sheet (open / close / tap-detail / drag-to-close)
 function openNotif(){ document.getElementById('notifSheet').classList.add('open'); }
-function closeNotif(){ document.getElementById('notifSheet').classList.remove('open'); }
+function closeNotif(){ var s=document.getElementById('notifSheet'); s.classList.remove('open'); setTimeout(function(){ s.classList.remove('detail'); },320); }
+function openNotifDetail(el){
+  var t=el.querySelector('.nt').textContent;
+  var full=el.getAttribute('data-full')||el.querySelector('.ns').textContent;
+  var time=el.querySelector('.ntime').textContent;
+  var icon=el.querySelector('.nic').innerHTML;
+  var tone=el.classList.contains('green')?'green':el.classList.contains('amber')?'amber':'';
+  document.getElementById('notifDetailBody').innerHTML=
+    '<div class="nd-ic '+tone+'">'+icon+'</div>'+
+    '<div class="nd-time">'+time+' ago</div>'+
+    '<div class="nd-title">'+t+'</div>'+
+    '<p class="nd-body">'+full+'</p>'+
+    '<button class="btn btn-primary" style="margin-top:22px" onclick="closeNotifDetail()">Mark as read</button>';
+  document.getElementById('notifSheet').classList.add('detail');
+}
+function closeNotifDetail(){ document.getElementById('notifSheet').classList.remove('detail'); }
+(function(){
+  var wrap=document.getElementById('notifSheet'); if(!wrap) return;
+  var sheet=wrap.querySelector('.sheet'), grips=wrap.querySelectorAll('.sheet-grip');
+  var startY=0, dy=0, dragging=false;
+  function start(y){ startY=y; dy=0; dragging=true; sheet.classList.add('dragging'); }
+  function move(y){ if(!dragging) return; dy=Math.max(0,y-startY); sheet.style.transform='translateY('+dy+'px)'; }
+  function end(){ if(!dragging) return; dragging=false; sheet.classList.remove('dragging'); var close=dy>110; sheet.style.transform=''; if(close) closeNotif(); }
+  grips.forEach(function(g){
+    g.addEventListener('touchstart',function(e){ start(e.touches[0].clientY); },{passive:true});
+    g.addEventListener('touchmove',function(e){ move(e.touches[0].clientY); },{passive:true});
+    g.addEventListener('touchend',end);
+    g.addEventListener('mousedown',function(e){ start(e.clientY);
+      function mm(ev){ move(ev.clientY); } function mu(){ end(); document.removeEventListener('mousemove',mm); document.removeEventListener('mouseup',mu); }
+      document.addEventListener('mousemove',mm); document.addEventListener('mouseup',mu); });
+  });
+})();
 
 // block pinch-zoom & double-tap zoom — native-app feel, page can't be scaled/dragged
 document.addEventListener('gesturestart',function(e){ e.preventDefault(); },{passive:false});
