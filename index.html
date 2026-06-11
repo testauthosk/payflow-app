@@ -1036,7 +1036,8 @@ let balDone=false;
 function countBalances(){
   const htg=document.getElementById('balHTG'), usd=document.getElementById('balUSD');
   if(!htg||!usd) return;
-  if(reduce){ htg.textContent='23,450'; usd.textContent='245.80'; return; }
+  if(balDone||reduce){ htg.textContent='23,450'; usd.textContent='245.80'; return; }
+  balDone=true;
   animNum(htg,23450,900,v=>Math.round(v).toLocaleString('en-US'));
   animNum(usd,245.80,900,v=>v.toFixed(2));
 }
