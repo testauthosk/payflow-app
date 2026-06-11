@@ -20,7 +20,11 @@ http.createServer((req, res) => {
       });
       return;
     }
-    res.writeHead(200, { 'Content-Type': TYPES[path.extname(file)] || 'application/octet-stream' });
+    const ext = path.extname(file);
+    const headers = { 'Content-Type': TYPES[ext] || 'application/octet-stream' };
+    // never cache the HTML so deploys show up immediately
+    if (ext === '.html') headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+    res.writeHead(200, headers);
     res.end(data);
   });
 }).listen(PORT, () => console.log('PayFlow listening on ' + PORT));
