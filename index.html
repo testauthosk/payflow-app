@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#1B3FA6">
+<title>PayFlow — Banking that moves Haiti forward</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#1B3FA6; --blue-2:#2A52C9; --blue-dark:#142E7A; --blue-bright:#2563EB;
+  --ink:#0E2150; --ink-2:#1B294F; --muted:#7A8499; --line:#EAEEF6;
+  --bg:#F3F6FC; --card:#FFFFFF; --soft:#F5F8FF;
+  --green:#14A45A; --green-bg:#E7F7EF; --red:#E0353B; --amber:#F2A93B;
+  --flag-blue:#00209F; --flag-red:#D21034;
+  --r:18px; --shadow:0 14px 34px -18px rgba(20,46,122,.34);
+  --shadow-sm:0 6px 18px -10px rgba(20,46,122,.28);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink);
+  display:flex;align-items:center;justify-content:center;min-height:100dvh;padding:0}
+/* desktop backdrop */
+.stage{position:fixed;inset:0;background:
+  radial-gradient(1200px 600px at 50% -10%, #1f3f96 0%, transparent 55%),
+  linear-gradient(180deg,#0e1c45,#0a1230);z-index:0}
+
+/* ===== phone shell ===== */
+.phone{position:relative;z-index:1;width:430px;max-width:100vw;height:932px;max-height:100dvh;
+  background:var(--bg);overflow:hidden;border-radius:0;box-shadow:0 40px 120px -30px rgba(0,0,0,.7)}
+@media(min-width:480px){.phone{border-radius:46px;border:11px solid #0a0d18;height:900px}}
+.viewport{position:absolute;inset:0;overflow:hidden}
+
+/* status bar */
+.statusbar{position:absolute;top:0;left:0;right:0;height:50px;display:flex;align-items:center;
+  justify-content:space-between;padding:0 30px;font-size:14.5px;font-weight:600;z-index:60;
+  color:var(--ink);pointer-events:none}
+.statusbar.on-blue{color:#fff}
+.statusbar .ico{display:flex;gap:6px;align-items:center}
+.statusbar .ico svg{width:17px;height:17px}
+
+/* screen system */
+.screen{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding-top:50px;display:none;animation:fade .32s ease both}
+.screen.active{display:block}
+.screen.has-nav{padding-bottom:96px}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.screen::-webkit-scrollbar{display:none}
+
+.pad{padding:0 20px}
+.h-title{font-size:1.5rem;font-weight:800;letter-spacing:-.02em;color:var(--ink)}
+.sub{color:var(--muted);font-size:13.5px}
+.row{display:flex;align-items:center}
+.between{justify-content:space-between}
+
+/* generic card */
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow-sm)}
+
+/* buttons */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  border:none;border-radius:14px;padding:16px;font-family:inherit;font-size:16px;font-weight:700;
+  cursor:pointer;transition:transform .15s,filter .2s,background .2s}
+.btn:active{transform:scale(.975)}
+.btn-primary{background:var(--blue);color:#fff;box-shadow:0 12px 24px -12px rgba(27,63,166,.8)}
+.btn-primary:active{background:var(--blue-dark)}
+.btn-ghost{background:#fff;color:var(--blue);border:1.5px solid #DCE4F5}
+.btn-soft{background:var(--soft);color:var(--blue);font-weight:600}
+
+/* app header (in-app screens) */
+.appbar{display:flex;align-items:center;justify-content:space-between;padding:6px 20px 10px}
+.appbar .ttl{font-size:17px;font-weight:700}
+.iconbtn{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#fff;
+  border:1px solid var(--line);cursor:pointer;color:var(--ink)}
+.iconbtn:active{transform:scale(.94)}
+.iconbtn svg{width:19px;height:19px}
+
+/* avatar */
+.av{border-radius:50%;object-fit:cover;background:#cdd8ee}
+.badge-v{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;
+  background:var(--blue);color:#fff}
+.badge-v svg{width:10px;height:10px}
+
+/* list rows */
+.lrow{display:flex;align-items:center;gap:13px;padding:13px 0}
+.lrow + .lrow{border-top:1px solid var(--line)}
+.licon{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;flex:none;
+  background:var(--soft);color:var(--blue)}
+.licon svg{width:20px;height:20px}
+.lmain{flex:1;min-width:0}
+.lmain .t{font-weight:600;font-size:14.5px;color:var(--ink-2)}
+.lmain .s{font-size:12px;color:var(--muted);margin-top:1px}
+.lamt{font-weight:700;font-size:14.5px;text-align:right;white-space:nowrap}
+.pos{color:var(--green)}.neg{color:var(--ink)}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;
+  padding:3px 8px;border-radius:20px}
+.pill.ok{background:var(--green-bg);color:var(--green)}
+.pill.pend{background:#FFF4E0;color:#C98113}
+.pill.att{background:#FDEAEA;color:var(--red)}
+.pill.ver{background:#E8EFFF;color:var(--blue)}
+
+/* chips */
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:8px 14px;border-radius:12px;background:#fff;border:1px solid var(--line);
+  font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer;white-space:nowrap}
+.chip.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
+.filter{display:flex;gap:7px;overflow-x:auto}
+.filter::-webkit-scrollbar{display:none}
+.ftab{flex:none;padding:7px 15px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;
+  background:#fff;border:1px solid var(--line);color:var(--muted)}
+.ftab.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+/* inputs */
+.field{margin-top:14px}
+.field label{font-size:12.5px;font-weight:600;color:var(--ink-2);display:block;margin-bottom:7px}
+.input{display:flex;align-items:center;gap:10px;background:#fff;border:1.4px solid #E2E8F5;
+  border-radius:13px;padding:13px 14px}
+.input:focus-within{border-color:var(--blue)}
+.input svg{width:18px;height:18px;color:var(--muted);flex:none}
+.input input{border:none;outline:none;font-family:inherit;font-size:15px;width:100%;background:none;color:var(--ink)}
+.search{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--line);
+  border-radius:13px;padding:12px 14px}
+.search svg{width:18px;height:18px;color:var(--muted)}
+.search input{border:none;outline:none;font-family:inherit;font-size:14px;width:100%;background:none}
+
+/* bottom nav */
+.bnav{position:absolute;bottom:0;left:0;right:0;height:86px;background:#fff;
+  border-top:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-around;
+  padding:9px 8px env(safe-area-inset-bottom);z-index:55;box-shadow:0 -10px 30px -18px rgba(20,46,122,.3)}
+.bitem{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10.5px;font-weight:600;
+  color:#9AA4BC;cursor:pointer;flex:1;padding-top:6px}
+.bitem svg{width:23px;height:23px}
+.bitem.sel{color:var(--blue)}
+.bitem.scan{margin-top:-22px}
+.bitem.scan .scc{width:56px;height:56px;border-radius:50%;background:var(--blue-bright);
+  display:grid;place-items:center;color:#fff;box-shadow:0 12px 24px -8px rgba(37,99,235,.7)}
+.bitem.scan .scc svg{width:26px;height:26px}
+
+/* logo mark */
+.mark{display:inline-flex;align-items:center;gap:9px}
+.mark .pm{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;
+  background:var(--blue);color:#fff;font-weight:800}
+.mark .pm svg{width:21px;height:21px}
+.mark .nm{font-weight:800;font-size:20px;letter-spacing:-.02em;color:var(--ink)}
+
+/* balance card */
+.balance{background:linear-gradient(135deg,#1E3A8F,#2B57C9);border-radius:20px;padding:18px 18px 16px;
+  color:#fff;box-shadow:0 18px 36px -18px rgba(27,63,166,.85);position:relative;overflow:hidden}
+.balance::after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;
+  border-radius:50%;background:rgba(255,255,255,.07)}
+.balance .lab{font-size:11px;font-weight:600;opacity:.8;letter-spacing:.02em}
+.balance .big{font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.balance .cur{font-size:13px;font-weight:600;opacity:.85;margin-left:3px}
+
+/* quick actions */
+.qa{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.qbtn{background:var(--blue);color:#fff;border-radius:15px;padding:13px 8px;display:flex;
+  flex-direction:column;align-items:center;gap:7px;font-size:12px;font-weight:600;cursor:pointer;
+  border:none;font-family:inherit;transition:transform .15s,background .2s}
+.qbtn:active{transform:scale(.96);background:var(--blue-dark)}
+.qbtn svg{width:21px;height:21px}
+.qbtn.wide{grid-column:span 1}
+
+/* services grid */
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.scard{background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px;cursor:pointer;
+  transition:transform .15s,box-shadow .2s}
+.scard:active{transform:scale(.97)}
+.scard .si{width:42px;height:42px;border-radius:13px;background:var(--soft);display:grid;place-items:center;color:var(--blue);margin-bottom:10px}
+.scard .si svg{width:21px;height:21px}
+.scard .st{font-weight:700;font-size:14px;color:var(--ink)}
+.scard .ss{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.35}
+
+/* rewards strip */
+.rew{display:flex;align-items:center;gap:11px;background:#FFF7E8;border:1px solid #FBE7BD;
+  border-radius:15px;padding:12px 14px}
+.rew .star{width:34px;height:34px;border-radius:50%;background:var(--amber);display:grid;place-items:center;color:#fff;flex:none}
+.rew .star svg{width:19px;height:19px}
+.rew .rt{font-weight:700;font-size:13px;color:#7A551A}
+.rew .rs{font-size:11.5px;color:#A07A33}
+
+/* exchange swap */
+.xbox{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px}
+.curtag{display:flex;align-items:center;gap:7px;background:var(--soft);border-radius:24px;padding:7px 12px;font-weight:700;font-size:14px;cursor:pointer}
+.curtag .fl{width:22px;height:22px;border-radius:50%;overflow:hidden;flex:none}
+.swapb{width:42px;height:42px;border-radius:50%;background:#fff;border:1px solid var(--line);display:grid;place-items:center;margin:-14px auto;position:relative;z-index:2;box-shadow:var(--shadow-sm);cursor:pointer;color:var(--blue)}
+.swapb svg{width:20px;height:20px}
+
+/* welcome */
+.hero-illus{height:170px;border-radius:18px;margin:6px 0 4px;
+  background:linear-gradient(180deg,#EAF1FF,#DCE8FF);display:grid;place-items:end center;overflow:hidden;position:relative}
+.dots{display:flex;gap:6px;justify-content:center;margin:14px 0}
+.dot{width:7px;height:7px;border-radius:50%;background:#CBD6EE}
+.dot.on{width:20px;background:var(--blue);border-radius:5px}
+.feat{display:flex;align-items:flex-start;gap:12px;padding:11px 0}
+.feat .fi{width:42px;height:42px;border-radius:12px;background:var(--soft);display:grid;place-items:center;color:var(--blue);flex:none}
+.feat .fi svg{width:21px;height:21px}
+.feat .ft{font-weight:700;font-size:14px}
+.feat .fs{font-size:12px;color:var(--muted);margin-top:1px;line-height:1.4}
+
+.trust{display:flex;justify-content:space-around;gap:6px;padding:14px 0 4px;border-top:1px solid var(--line);margin-top:8px}
+.trust .ti{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10.5px;color:var(--muted);font-weight:600;text-align:center}
+.trust .ti svg{width:20px;height:20px;color:var(--blue)}
+
+.note{font-size:11px;color:var(--muted);text-align:center;margin-top:12px}
+.divider{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:12px;margin:16px 0}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--line)}
+
+/* demo ribbon */
+.ribbon{position:absolute;z-index:70;top:54px;left:50%;transform:translateX(-50%);
+  background:rgba(14,33,80,.82);color:#fff;font-size:10.5px;font-weight:600;padding:5px 12px;border-radius:20px;
+  backdrop-filter:blur(6px);letter-spacing:.02em;pointer-events:none;white-space:nowrap}
+
+.flag-emoji{font-size:15px}
+.section-gap{height:16px}
+.toast{position:absolute;left:50%;bottom:108px;transform:translateX(-50%) translateY(20px);
+  background:var(--ink);color:#fff;font-size:13px;font-weight:600;padding:11px 18px;border-radius:12px;
+  opacity:0;transition:.3s;z-index:80;box-shadow:var(--shadow)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="stage"></div>
+
+<div class="phone">
+  <div class="viewport">
+
+    <!-- STATUS BAR -->
+    <div class="statusbar" id="statusbar">
+      <span id="clock">9:41</span>
+      <span class="ico">
+        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="11" width="3" height="7" rx="1"/><rect x="7" y="8" width="3" height="10" rx="1"/><rect x="12" y="5" width="3" height="13" rx="1"/><rect x="17" y="3" width="3" height="15" rx="1" opacity=".4"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5C7.5 5 3.7 6.9 1 9.9l11 13.1 11-13.1C20.3 6.9 16.5 5 12 5z"/></svg>
+        <svg viewBox="0 0 26 24" fill="none"><rect x="1.5" y="6" width="20" height="12" rx="3" stroke="currentColor" stroke-width="1.6"/><rect x="3.5" y="8" width="15" height="8" rx="1.5" fill="currentColor"/><rect x="23" y="9.5" width="2" height="5" rx="1" fill="currentColor"/></svg>
+      </span>
+    </div>
+    <div class="ribbon" id="ribbon">PayFlow · interactive demo</div>
+
+    <!-- ============ 1. WELCOME ============ -->
+    <section class="screen active" data-screen="welcome">
+      <div class="pad" style="padding-top:8px">
+        <div class="mark" style="justify-content:center;margin-top:6px">
+          <span class="pm"><svg viewBox="0 0 24 24" fill="none"><path d="M4 17l5-10 3 6 2-4 6 8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span class="nm">PayFlow</span>
+        </div>
+        <h1 class="h-title" style="text-align:center;margin:18px 0 4px;font-size:1.45rem">Banking that<br>moves Haiti forward</h1>
+        <p class="sub" style="text-align:center">Simple. Secure. Made for you.</p>
+
+        <div class="hero-illus">
+          <svg viewBox="0 0 320 150" style="width:100%;height:100%" preserveAspectRatio="xMidYMax meet">
+            <g fill="#9FB8F0" opacity=".9">
+              <path d="M0 150 L0 110 Q40 90 70 105 L75 60 L82 105 Q110 92 150 108 L150 70 L160 60 L170 70 L170 110 Q220 92 260 106 L264 70 L270 106 Q300 96 320 112 L320 150 Z"/>
+            </g>
+            <g stroke="#7E9DEB" stroke-width="3" fill="none" stroke-linecap="round">
+              <path d="M40 110 q4 -26 8 -40"/><path d="M48 70 q-9 4 -13 10 M48 70 q9 3 12 9 M48 70 q-3 -8 0 -14"/>
+            </g>
+            <rect x="150" y="58" width="10" height="52" fill="#6F90E5"/>
+          </svg>
+        </div>
+
+        <div class="dots"><span class="dot on"></span><span class="dot"></span><span class="dot"></span></div>
+
+        <div class="feat"><div class="fi"><svg viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="ft">Send and receive money</div><div class="fs">Move money instantly, wherever you are.</div></div></div>
+        <div class="feat"><div class="fi"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="13" rx="2" stroke="currentColor" stroke-width="2"/><path d="M3 10h18" stroke="currentColor" stroke-width="2"/></svg></div><div><div class="ft">Pay bills and top up</div><div class="fs">Stay connected and pay with ease.</div></div></div>
+        <div class="feat"><div class="fi"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v18M5 8l7-5 7 5M4 21h16M6 21l1-9M18 21l-1-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="ft">Manage HTG and USD</div><div class="fs">Your balances. Your choice.</div></div></div>
+
+        <div style="height:18px"></div>
+        <button class="btn btn-primary" onclick="go('login')">Get Started</button>
+        <div style="height:10px"></div>
+        <button class="btn btn-ghost" onclick="go('login')">Log In</button>
+
+        <div class="trust">
+          <div class="ti"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="1.8"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Secure<br>banking</div>
+          <div class="ti"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="1.8"/></svg>Biometric<br>login</div>
+          <div class="ti"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="9" r="6" stroke="currentColor" stroke-width="1.8"/><path d="M8 14l-1 7 5-3 5 3-1-7" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Verified<br>access</div>
+        </div>
+        <div style="height:14px"></div>
+      </div>
+    </section>
+
+    <!-- ============ 2. LOGIN ============ -->
+    <section class="screen" data-screen="login">
+      <div class="pad" style="padding-top:14px">
+        <div class="mark" style="justify-content:center"><span class="pm"><svg viewBox="0 0 24 24" fill="none"><path d="M4 17l5-10 3 6 2-4 6 8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="nm">PayFlow</span></div>
+        <h2 class="h-title" style="text-align:center;margin-top:20px;font-size:1.3rem">Welcome back!</h2>
+        <p class="sub" style="text-align:center">Sign in to continue to your account</p>
+
+        <div class="field">
+          <label>Phone or Email</label>
+          <div class="input"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6" stroke="currentColor" stroke-width="2"/></svg><input value="+509 38 12 34 56" inputmode="tel"></div>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <div class="input"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="10" width="16" height="11" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 10V7a4 4 0 018 0v3" stroke="currentColor" stroke-width="2"/></svg><input type="password" value="payflow123"><svg viewBox="0 0 24 24" fill="none" style="cursor:pointer"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg></div>
+          <div style="text-align:right;margin-top:8px"><span style="color:var(--red);font-size:12.5px;font-weight:600">Forgot password?</span></div>
+        </div>
+
+        <div style="height:10px"></div>
+        <button class="btn btn-primary" onclick="go('home')">Sign In</button>
+        <div class="divider">or</div>
+
+        <div class="card" style="padding:15px;display:flex;align-items:center;gap:13px;cursor:pointer" onclick="go('home')">
+          <svg viewBox="0 0 24 24" fill="none" style="width:30px;height:30px;color:var(--blue)"><path d="M12 11v2m-5-3a8 8 0 0110 0M4 8a13 13 0 0116 0M9 16a4 4 0 016 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <div style="flex:1"><div style="font-weight:700;font-size:14px">Login with Biometrics</div><div style="font-size:11.5px;color:var(--muted)">Use Face ID or Fingerprint for a faster login</div></div>
+        </div>
+        <div style="height:12px"></div>
+        <button class="btn btn-soft" onclick="go('home')">Use Face ID / Fingerprint</button>
+
+        <p class="note">🛡 Your security is our priority<br>Protected by encryption and real-time monitoring</p>
+      </div>
+    </section>
+
+    <!-- ============ 3. HOME ============ -->
+    <section class="screen has-nav" data-screen="home">
+      <div class="pad" style="padding-top:6px">
+        <div class="row between">
+          <div class="row" style="gap:11px">
+            <div class="av" style="width:44px;height:44px;display:grid;place-items:center;font-weight:700;color:#3a59b8;background:#D9E3FA">JL</div>
+            <div>
+              <div class="row" style="gap:5px"><span style="font-weight:700;font-size:15px">Jean-Baptiste Louis</span><span class="badge-v"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+              <div style="font-size:12px;color:var(--muted)">+509 38 12 34 56</div>
+            </div>
+          </div>
+          <div class="row" style="gap:8px">
+            <div class="iconbtn"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="1.8"/></svg></div>
+            <div class="iconbtn" style="position:relative"><svg viewBox="0 0 24 24" fill="none"><path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8z" stroke="currentColor" stroke-width="1.8"/><path d="M10 21a2 2 0 004 0" stroke="currentColor" stroke-width="1.8"/></svg><span style="position:absolute;top:7px;right:8px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1.5px solid #fff"></span></div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:11px 13px;margin-top:13px;display:flex;align-items:center;gap:10px">
+          <div style="width:34px;height:34px;border-radius:10px;background:var(--soft);display:grid;place-items:center;color:var(--blue)"><svg viewBox="0 0 24 24" fill="none" style="width:18px;height:18px"><rect x="4" y="10" width="16" height="11" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 10V7a4 4 0 018 0v3" stroke="currentColor" stroke-width="2"/></svg></div>
+          <div style="flex:1"><div style="font-weight:700;font-size:13.5px">Bonjou, Jean-Baptiste!</div><div style="font-size:11.5px;color:var(--green)">Your account is secure ✓</div></div>
+        </div>
+
+        <div class="balance" style="margin-top:13px">
+          <div class="row between">
+            <div><div class="lab">HTG Balance</div><div class="big">23,450<span class="cur">HTG</span></div></div>
+            <div style="text-align:right"><div class="lab">USD Balance</div><div class="big">245.80<span class="cur">USD</span></div></div>
+          </div>
+          <div class="row between" style="margin-top:14px">
+            <span class="pill ver" style="background:rgba(255,255,255,.16);color:#fff"><svg viewBox="0 0 24 24" fill="none" style="width:13px;height:13px"><path d="M5 12l4 4 10-10" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>Verified Account</span>
+            <span class="pill" style="background:#FBD96B;color:#6B4E12">★ Rewards Cashback</span>
+          </div>
+        </div>
+
+        <div class="qa">
+          <button class="qbtn" onclick="go('send')"><svg viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Send Money</button>
+          <button class="qbtn" onclick="go('topup')"><svg viewBox="0 0 24 24" fill="none"><path d="M12 4v12m0 0l-4-4m4 4l4-4M5 20h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Receive</button>
+          <button class="qbtn" onclick="go('services')"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Pay Bills</button>
+        </div>
+        <div class="qa" style="grid-template-columns:1fr 1fr;margin-top:10px">
+          <button class="qbtn" onclick="go('exchange')"><svg viewBox="0 0 24 24" fill="none"><path d="M3 8h13l-3-3M21 16H8l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Exchange</button>
+          <button class="qbtn" onclick="go('topup')"><svg viewBox="0 0 24 24" fill="none"><rect x="6" y="2" width="12" height="20" rx="2.5" stroke="currentColor" stroke-width="2"/><path d="M11 18h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Mobile Top Up</button>
+        </div>
+
+        <div class="row between" style="margin-top:20px"><span style="font-weight:700;font-size:15px">Recent Transactions</span><span style="color:var(--blue);font-weight:600;font-size:13px;cursor:pointer" onclick="go('transactions')">View All</span></div>
+        <div style="margin-top:4px" id="homeTx"></div>
+      </div>
+    </section>
+
+    <!-- ============ 4. TOP UP ============ -->
+    <section class="screen" data-screen="topup">
+      <div class="appbar"><div class="iconbtn" onclick="back()"><svg viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="ttl">Top Up</span><div class="iconbtn"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="1.8"/></svg></div></div>
+      <div class="pad">
+        <label style="font-size:12.5px;font-weight:600;color:var(--ink-2)">Enter amount</label>
+        <div class="card" style="padding:16px;margin-top:8px;display:flex;align-items:center;justify-content:space-between">
+          <input id="topAmt" value="2,000" inputmode="numeric" style="border:none;outline:none;font-family:inherit;font-size:30px;font-weight:800;width:60%;color:var(--ink)">
+          <span class="curtag"><span class="fl"><svg viewBox="0 0 24 24" width="22" height="22"><rect width="24" height="12" fill="#00209F"/><rect y="12" width="24" height="12" fill="#D21034"/></svg></span>HTG ▾</span>
+        </div>
+        <div class="chips" style="margin-top:12px">
+          <span class="chip" onclick="setTop(this,'500')">500 HTG</span>
+          <span class="chip" onclick="setTop(this,'1,000')">1,000 HTG</span>
+          <span class="chip sel" onclick="setTop(this,'2,000')">2,000 HTG</span>
+          <span class="chip" onclick="setTop(this,'5,000')">5,000 HTG</span>
+        </div>
+
+        <div style="font-weight:700;font-size:14px;margin:18px 0 4px">Choose a funding method</div>
+        <div class="card" style="padding:4px 14px">
+          <div class="lrow"><div class="licon"><svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M2 9h20" stroke="currentColor" stroke-width="2"/></svg></div><div class="lmain"><div class="t">Bank Card</div><div class="s">Visa, Mastercard</div></div><span style="font-weight:800;color:#1A1F71;font-size:12px">VISA</span></div>
+          <div class="lrow"><div class="licon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 9l9-5 9 5M4 9v10h16V9M9 19v-6h6v6" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div><div class="lmain"><div class="t">Bank Transfer</div><div class="s">Local banks in Haiti</div></div><svg viewBox="0 0 24 24" fill="none" style="width:18px;color:var(--muted)"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <div class="lrow"><div class="licon"><svg viewBox="0 0 24 24" fill="none"><rect x="6" y="2" width="12" height="20" rx="2.5" stroke="currentColor" stroke-width="2"/><path d="M11 18h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div class="lmain"><div class="t">Mobile Money</div><div class="s">MonCash, NatCash, T-Cash</div></div><svg viewBox="0 0 24 24" fill="none" style="width:18px;color:var(--muted)"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <div class="lrow"><div class="licon" style="background:#E7FBF4;color:#0E9E73"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M9 8h4a2 2 0 010 4H9m0 0h5a2 2 0 010 4H9m0-8v8m2-10v2m0 6v2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div><div class="lmain"><div class="t">Crypto Top Up</div><div class="s">USDT, BTC, ETH</div></div><span style="font-size:15px">₿</span></div>
+        </div>
+        <p class="note">🔒 Your funds are secure. Instant balance update after every successful top-up.</p>
+        <div style="height:8px"></div>
+        <button class="btn btn-primary" onclick="toast('Top-up of HTG '+document.getElementById('topAmt').value+' confirmed');setTimeout(()=>go('home'),900)">Continue</button>
+        <div style="height:14px"></div>
+      </div>
+    </section>
+
+    <!-- ============ 5. PAY WITH QR ============ -->
+    <section class="screen" data-screen="qr">
+      <div class="appbar" style="background:var(--blue);margin:0;padding:10px 20px;color:#fff">
+        <div class="iconbtn" style="background:rgba(255,255,255,.16);border:none;color:#fff" onclick="back()"><svg viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <span class="ttl" style="color:#fff">Pay with QR</span><span style="width:38px"></span>
+      </div>
+      <div style="background:#0E1A33;padding:18px 20px 22px;text-align:center;color:#fff">
+        <div style="font-size:13px;opacity:.85;margin-bottom:14px">Scan merchant QR code</div>
+        <div style="position:relative;width:210px;height:210px;margin:0 auto;border-radius:14px;background:#fff;display:grid;place-items:center">
+          <div style="position:absolute;inset:-3px;border:3px solid var(--blue-bright);border-radius:18px;clip-path:polygon(0 0,32% 0,32% 6%,6% 6%,6% 32%,0 32%,0 0, 0 68%,6% 68%,6% 94%,32% 94%,32% 100%,0 100%, 100% 100%,68% 100%,68% 94%,94% 94%,94% 68%,100% 68%,100% 100%, 100% 0,68% 0,68% 6%,94% 6%,94% 32%,100% 32%,100% 0)"></div>
+          <div style="text-align:center"><div style="color:var(--flag-blue);font-weight:700;font-size:13px;margin-bottom:6px">Merci!</div>
+          <svg viewBox="0 0 100 100" width="120" height="120"><rect width="100" height="100" fill="#fff"/><g fill="#0E1A33"><rect x="6" y="6" width="22" height="22"/><rect x="11" y="11" width="12" height="12" fill="#fff"/><rect x="14" y="14" width="6" height="6" fill="#0E1A33"/><rect x="72" y="6" width="22" height="22"/><rect x="77" y="11" width="12" height="12" fill="#fff"/><rect x="80" y="14" width="6" height="6" fill="#0E1A33"/><rect x="6" y="72" width="22" height="22"/><rect x="11" y="77" width="12" height="12" fill="#fff"/><rect x="14" y="80" width="6" height="6" fill="#0E1A33"/><rect x="36" y="6" width="6" height="6"/><rect x="48" y="6" width="6" height="12"/><rect x="60" y="12" width="6" height="6"/><rect x="36" y="18" width="12" height="6"/><rect x="6" y="36" width="6" height="6"/><rect x="18" y="36" width="6" height="12"/><rect x="36" y="36" width="12" height="12"/><rect x="54" y="36" width="6" height="6"/><rect x="66" y="42" width="6" height="6"/><rect x="78" y="36" width="12" height="6"/><rect x="36" y="54" width="6" height="12"/><rect x="48" y="60" width="12" height="6"/><rect x="66" y="60" width="6" height="12"/><rect x="78" y="66" width="12" height="12"/><rect x="42" y="78" width="6" height="12"/><rect x="54" y="78" width="12" height="6"/><rect x="66" y="84" width="6" height="6"/></g></svg>
+          <div style="color:var(--flag-blue);font-weight:700;font-size:12px;margin-top:4px">SCAN POU PEYE</div></div>
+        </div>
+      </div>
+      <div class="pad" style="padding-top:14px">
+        <div style="text-align:center;font-size:13px;color:var(--muted);margin-bottom:12px">Scan the merchant QR code</div>
+        <div class="card" style="padding:14px;display:flex;align-items:center;gap:12px">
+          <div class="licon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 9l9-5 9 5M4 9v10h16V9M9 19v-6h6v6" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+          <div style="flex:1"><div style="font-weight:700;font-size:14px">Ti Malolo Market</div><div style="font-size:11.5px;color:var(--muted)">Port-au-Prince, Haiti</div><div style="font-size:12px;color:var(--green);margin-top:3px">● Ready to confirm</div></div>
+          <div style="text-align:right"><div style="font-weight:800;font-size:16px">450 HTG</div><div style="font-size:11px;color:var(--muted)">Amount</div></div>
+        </div>
+        <div style="height:14px"></div>
+        <button class="btn btn-primary" onclick="toast('Paid 450 HTG to Ti Malolo Market ✓');setTimeout(()=>go('home'),950)">Confirm Payment</button>
+        <div style="height:14px"></div>
+      </div>
+    </section>
+
+    <!-- ============ 6. EXCHANGE ============ -->
+    <section class="screen" data-screen="exchange">
+      <div class="appbar"><div class="iconbtn" onclick="back()"><svg viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="ttl">Exchange</span><div class="iconbtn"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="1.8"/></svg></div></div>
+      <div class="pad">
+        <div class="xbox">
+          <div class="row between"><span style="font-size:12px;color:var(--muted);font-weight:600">From</span></div>
+          <div class="row between" style="margin-top:4px">
+            <input id="xFrom" value="5,000" inputmode="numeric" oninput="calcX()" style="border:none;outline:none;font-family:inherit;font-size:26px;font-weight:800;width:55%;color:var(--ink)">
+            <span class="curtag"><span class="fl"><svg viewBox="0 0 24 24" width="22" height="22"><rect width="24" height="12" fill="#00209F"/><rect y="12" width="24" height="12" fill="#D21034"/></svg></span>HTG ▾</span>
+          </div>
+          <div style="font-size:11.5px;color:var(--muted);margin-top:3px">Balance: 23,450 HTG</div>
+        </div>
+        <div class="swapb"><svg viewBox="0 0 24 24" fill="none"><path d="M8 3v18m0 0l-3-3m3 3l3-3M16 21V3m0 0l-3 3m3-3l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="xbox">
+          <div class="row between"><span style="font-size:12px;color:var(--muted);font-weight:600">To</span></div>
+          <div class="row between" style="margin-top:4px">
+            <span id="xTo" style="font-size:26px;font-weight:800;color:var(--ink)">24.50</span>
+            <span class="curtag"><span class="fl"><svg viewBox="0 0 24 24" width="22" height="22"><rect width="24" height="16" fill="#3C3B6E"/><rect y="16" width="24" height="8" fill="#B22234"/></svg></span>USD ▾</span>
+          </div>
+          <div style="font-size:11.5px;color:var(--muted);margin-top:3px">Balance: 245.80 USD</div>
+        </div>
+
+        <div class="card" style="padding:15px;margin-top:14px">
+          <div class="row between"><span style="font-size:13px;color:var(--muted)">Exchange Rate</span><span style="font-weight:700;font-size:13px">1 USD = 203.25 HTG</span></div>
+          <div style="text-align:right;font-size:11.5px;color:var(--green);margin-top:2px">✓ Best rate applied</div>
+          <div style="height:1px;background:var(--line);margin:12px 0"></div>
+          <div style="font-weight:700;font-size:13px;margin-bottom:8px">Fee Summary</div>
+          <div class="row between" style="font-size:13px;color:var(--ink-2);margin-bottom:6px"><span>Exchange Fee (0.50%)</span><span>25.00 HTG</span></div>
+          <div class="row between" style="font-size:13px;color:var(--ink-2)"><span>Network Fee</span><span>10.00 HTG</span></div>
+          <div style="height:1px;background:var(--line);margin:12px 0"></div>
+          <div class="row between"><span style="font-weight:700">You Will Receive</span><span id="xRecv" style="font-weight:800;color:var(--blue)">24.50 USD</span></div>
+        </div>
+        <div style="height:14px"></div>
+        <button class="btn btn-primary" onclick="toast('Exchange submitted for review ✓');setTimeout(()=>go('home'),900)">Review Exchange</button>
+        <p class="note">🔒 Secure • Fast • Trusted</p>
+      </div>
+    </section>
+
+    <!-- ============ 7. SEND MONEY ============ -->
+    <section class="screen" data-screen="send">
+      <div class="appbar"><div class="iconbtn" onclick="back()"><svg viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="ttl">Send Money</span><div class="iconbtn"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="1.8"/></svg></div></div>
+      <div class="pad">
+        <label style="font-size:12.5px;font-weight:600;color:var(--ink-2)">Recipient</label>
+        <div class="card" style="padding:13px;margin-top:8px;display:flex;align-items:center;gap:12px">
+          <div class="av" style="width:42px;height:42px;display:grid;place-items:center;font-weight:700;color:#a23b5e;background:#FAD9E3">MP</div>
+          <div style="flex:1"><div style="font-weight:700;font-size:14px">Marie Pierre</div><div style="font-size:12px;color:var(--muted)">+509 36 25 78 90</div></div>
+          <span class="pill ok">✓ Verified</span>
+        </div>
+
+        <label style="font-size:12.5px;font-weight:600;color:var(--ink-2);display:block;margin-top:16px;margin-bottom:8px">You send</label>
+        <div style="display:flex;background:#fff;border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px">
+          <button class="seg sel" onclick="seg(this,1)" style="flex:1;border:none;border-radius:9px;padding:10px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;background:var(--blue);color:#fff">HTG</button>
+          <button class="seg" onclick="seg(this,0)" style="flex:1;border:none;border-radius:9px;padding:10px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;background:none;color:var(--muted)">USD</button>
+        </div>
+        <div class="card" style="padding:15px;margin-top:10px;display:flex;align-items:center;justify-content:space-between">
+          <input value="5,000" inputmode="numeric" style="border:none;outline:none;font-family:inherit;font-size:24px;font-weight:800;width:60%;color:var(--ink)">
+          <span style="font-weight:700;color:var(--muted)">HTG</span>
+        </div>
+        <div class="row between" style="font-size:11.5px;color:var(--muted);margin-top:5px"><span>≈ 41.67 USD</span><span>Rate: 1 USD = 120.00 HTG</span></div>
+
+        <div class="field"><label>Note (optional)</label><div class="input"><input value="For school fees"></div></div>
+
+        <div class="card" style="padding:14px;margin-top:14px;background:var(--green-bg);border:1px solid #C8EBD6">
+          <div class="row between"><span style="font-size:12.5px;color:var(--muted)">Recipient gets</span></div>
+          <div class="row" style="gap:8px;margin-top:3px"><span style="font-weight:800;font-size:18px;color:var(--green)">5,000 HTG</span><span class="pill ok">✓</span></div>
+          <div style="font-size:11.5px;color:var(--muted);margin-top:2px">Marie Pierre will receive instantly.</div>
+        </div>
+        <div style="height:14px"></div>
+        <button class="btn btn-primary" onclick="toast('5,000 HTG sent to Marie Pierre ✓');setTimeout(()=>go('home'),950)">Send Now →</button>
+        <p class="note">🔒 Your transfer is secure and protected</p>
+      </div>
+    </section>
+
+    <!-- ============ 8. SERVICES ============ -->
+    <section class="screen has-nav" data-screen="services">
+      <div class="pad" style="padding-top:6px">
+        <div class="row between"><div><div class="h-title" style="font-size:1.3rem">Services</div><div class="sub">Pay for what matters, easily.</div></div>
+          <div class="iconbtn" style="position:relative"><svg viewBox="0 0 24 24" fill="none"><path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8z" stroke="currentColor" stroke-width="1.8"/><path d="M10 21a2 2 0 004 0" stroke="currentColor" stroke-width="1.8"/></svg><span style="position:absolute;top:7px;right:8px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1.5px solid #fff"></span></div>
+        </div>
+        <div class="search" style="margin-top:14px"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input placeholder="Search services"></div>
+        <div class="sgrid">
+          <div class="scard" onclick="toast('Mobile Top Up')"><div class="si"><svg viewBox="0 0 24 24" fill="none"><rect x="6" y="2" width="12" height="20" rx="2.5" stroke="currentColor" stroke-width="2"/><path d="M11 18h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div class="st">Mobile Top Up</div><div class="ss">Top up your mobile instantly.</div></div>
+          <div class="scard" onclick="toast('TV & Phone')"><div class="si"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="12" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 21h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div class="st">TV & Phone</div><div class="ss">Pay for cable, internet and phone.</div></div>
+          <div class="scard" onclick="toast('Utilities')"><div class="si"><svg viewBox="0 0 24 24" fill="none"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div><div class="st">Utilities</div><div class="ss">Pay electricity, water and more.</div></div>
+          <div class="scard" onclick="toast('Government Payments')"><div class="si"><svg viewBox="0 0 24 24" fill="none"><path d="M3 9l9-5 9 5M4 9v10h16V9M9 19v-6h6v6" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div><div class="st">Government Payments</div><div class="ss">Pay taxes, fees and official services.</div></div>
+          <div class="scard" onclick="toast('Stores')"><div class="si"><svg viewBox="0 0 24 24" fill="none"><path d="M5 8h14l-1 12H6L5 8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 8a3 3 0 016 0" stroke="currentColor" stroke-width="2"/></svg></div><div class="st">Stores</div><div class="ss">Pay at your favorite stores.</div></div>
+          <div class="scard" onclick="toast('Tickets')"><div class="si"><svg viewBox="0 0 24 24" fill="none"><path d="M3 8a2 2 0 012-2h14a2 2 0 012 2 2 2 0 000 4 2 2 0 010 4 2 2 0 01-2 2H5a2 2 0 01-2-2 2 2 0 000-4 2 2 0 010-4z" stroke="currentColor" stroke-width="1.8"/></svg></div><div class="st">Tickets</div><div class="ss">Buy tickets for travel, events and more.</div></div>
+          <div class="scard" onclick="toast('Insurance')"><div class="si"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="1.8"/></svg></div><div class="st">Insurance</div><div class="ss">Protect what matters with ease.</div></div>
+          <div class="scard" onclick="go('exchange')"><div class="si"><svg viewBox="0 0 24 24" fill="none"><path d="M3 8h13l-3-3M21 16H8l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="st">Exchange</div><div class="ss">Convert between HTG and USD.</div></div>
+        </div>
+        <div style="height:8px"></div>
+      </div>
+    </section>
+
+    <!-- ============ 9. TRANSACTIONS ============ -->
+    <section class="screen has-nav" data-screen="transactions">
+      <div class="pad" style="padding-top:6px">
+        <div class="row between">
+          <div class="row" style="gap:11px"><div class="av" style="width:40px;height:40px;display:grid;place-items:center;font-weight:700;color:#3a59b8;background:#D9E3FA">JL</div>
+          <div><div class="row" style="gap:5px"><span style="font-weight:700;font-size:14px">Jean-Baptiste Louis</span><span class="badge-v"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg></span></div><div style="font-size:11.5px;color:var(--muted)">+509 38 12 34 56</div></div></div>
+          <div class="iconbtn"><svg viewBox="0 0 24 24" fill="none"><path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8z" stroke="currentColor" stroke-width="1.8"/><path d="M10 21a2 2 0 004 0" stroke="currentColor" stroke-width="1.8"/></svg></div>
+        </div>
+        <h2 class="h-title" style="font-size:1.3rem;margin-top:14px">Transaction History</h2>
+        <div class="search" style="margin-top:12px"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input placeholder="Search transactions"></div>
+        <div class="filter" style="margin-top:12px">
+          <span class="ftab sel" onclick="ftab(this)">All</span><span class="ftab" onclick="ftab(this)">Income</span><span class="ftab" onclick="ftab(this)">Payments</span><span class="ftab" onclick="ftab(this)">Exchange</span><span class="ftab" onclick="ftab(this)">Top Up</span>
+        </div>
+        <div style="margin-top:6px" id="allTx"></div>
+        <div style="height:8px"></div>
+      </div>
+    </section>
+
+    <!-- ============ 10. PROFILE ============ -->
+    <section class="screen has-nav" data-screen="profile">
+      <div class="appbar"><div class="iconbtn" onclick="go('home')"><svg viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="ttl">Profile</span><div class="iconbtn"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/><path d="M19 12a7 7 0 00-.1-1l2-1.5-2-3.4-2.3 1a7 7 0 00-1.7-1l-.3-2.6H10l-.3 2.6a7 7 0 00-1.7 1l-2.3-1-2 3.4L5.7 11a7 7 0 000 2l-2 1.5 2 3.4 2.3-1a7 7 0 001.7 1l.3 2.6h3.6l.3-2.6a7 7 0 001.7-1l2.3 1 2-3.4-2-1.5a7 7 0 00.1-1z" stroke="currentColor" stroke-width="1.6"/></svg></div></div>
+      <div class="pad">
+        <div style="text-align:center;margin-top:4px">
+          <div class="av" style="width:84px;height:84px;display:grid;place-items:center;font-weight:800;font-size:26px;color:#3a59b8;background:#D9E3FA;margin:0 auto;position:relative">JL<span class="badge-v" style="position:absolute;bottom:2px;right:6px;width:22px;height:22px;border:2px solid #fff"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg></span></div>
+          <div class="row" style="gap:6px;justify-content:center;margin-top:10px"><span style="font-weight:800;font-size:18px">Jean-Baptiste Louis</span><span class="badge-v"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg></span></div>
+          <div style="font-size:13px;color:var(--muted)">+509 38 12 34 56</div>
+          <div style="font-size:13px;color:var(--muted)">jeanbaptiste.louis@email.ht</div>
+          <span class="pill ver" style="margin-top:8px">Verified Account</span>
+        </div>
+        <div class="card" style="padding:4px 16px;margin-top:18px">
+          <div class="lrow"><div class="licon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6" stroke="currentColor" stroke-width="2"/></svg></div><div class="lmain"><div class="t">Personal Information</div><div class="s">Name, phone, email, address</div></div><svg viewBox="0 0 24 24" fill="none" style="width:18px;color:var(--muted)"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2"/></svg></div>
+          <div class="lrow"><div class="licon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="1.8"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div><div class="lmain"><div class="t">Verification Status</div><div class="s">KYC Approved</div></div><span class="pill ok">✓ Verified</span></div>
+          <div class="lrow"><div class="licon"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="10" width="16" height="11" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 10V7a4 4 0 018 0v3" stroke="currentColor" stroke-width="2"/></svg></div><div class="lmain"><div class="t">Security Settings</div><div class="s">Password, PIN, 2FA, security alerts</div></div><svg viewBox="0 0 24 24" fill="none" style="width:18px;color:var(--muted)"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2"/></svg></div>
+          <div class="lrow"><div class="licon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 11v3m-5-4a8 8 0 0110 0M9 16a4 4 0 016 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div><div class="lmain"><div class="t">Biometric Access</div><div class="s">Face ID & Fingerprint Login</div></div><span class="pill ok">● Enabled</span></div>
+          <div class="lrow"><div class="licon"><svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M2 9h20" stroke="currentColor" stroke-width="2"/></svg></div><div class="lmain"><div class="t">Linked Cards</div><div class="s">View and manage your cards</div></div><span style="font-size:12.5px;color:var(--muted);font-weight:600">2 Cards ›</span></div>
+          <div class="lrow"><div class="licon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8z" stroke="currentColor" stroke-width="1.8"/><path d="M10 21a2 2 0 004 0" stroke="currentColor" stroke-width="1.8"/></svg></div><div class="lmain"><div class="t">Notifications</div><div class="s">Manage alerts and updates</div></div><span style="font-size:12.5px;color:var(--green);font-weight:600">On ›</span></div>
+          <div class="lrow"><div class="licon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M9.5 9a2.5 2.5 0 015 .5c0 1.5-2.5 2-2.5 3.5M12 17h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><div class="lmain"><div class="t">Help & Support</div><div class="s">FAQs, chat with support, contact us</div></div><svg viewBox="0 0 24 24" fill="none" style="width:18px;color:var(--muted)"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2"/></svg></div>
+        </div>
+        <div class="rew" style="margin-top:14px"><div class="star"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1 3-6z"/></svg></div><div style="flex:1"><div class="rt">Unlock More with Verification</div><div class="rs">Increase your limits, send more, and enjoy all PayFlow features.</div></div></div>
+        <div style="height:8px"></div>
+      </div>
+    </section>
+
+    <!-- ===== BOTTOM NAV ===== -->
+    <nav class="bnav" id="bnav" style="display:none">
+      <div class="bitem" data-tab="home" onclick="go('home')"><svg viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7M5 10v10h5v-6h4v6h5V10" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Home</div>
+      <div class="bitem" data-tab="transactions" onclick="go('transactions')"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M3 9h18" stroke="currentColor" stroke-width="2"/></svg>Accounts</div>
+      <div class="bitem scan" data-tab="qr" onclick="go('qr')"><span class="scc"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7V5a1 1 0 011-1h2M4 17v2a1 1 0 001 1h2M20 7V5a1 1 0 00-1-1h-2M20 17v2a1 1 0 01-1 1h-2M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>Scan</div>
+      <div class="bitem" data-tab="cards" onclick="go('profile')"><svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M2 10h20M6 15h4" stroke="currentColor" stroke-width="2"/></svg>Cards</div>
+      <div class="bitem" data-tab="services" onclick="go('services')"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>More</div>
+    </nav>
+
+    <div class="toast" id="toast"></div>
+  </div>
+</div>
+
+<script>
+const TAB_SCREENS = ['home','transactions','services','profile']; // bottom nav only here
+const BLUE_BAR = []; // status bar region always sits over light bg
+let stack = ['welcome'];
+
+function setStatusTheme(name){
+  const sb = document.getElementById('statusbar');
+  sb.classList.toggle('on-blue', BLUE_BAR.includes(name));
+}
+function go(name, isBack){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el = document.querySelector('[data-screen="'+name+'"]');
+  if(!el) return;
+  el.classList.add('active'); el.scrollTop = 0;
+  if(!isBack && stack[stack.length-1]!==name) stack.push(name);
+  // bottom nav only on the four tab destinations (sub-flows use back button)
+  document.getElementById('bnav').style.display = TAB_SCREENS.includes(name) ? 'flex' : 'none';
+  document.getElementById('ribbon').style.display = name==='welcome' ? 'block':'none';
+  // nav active state (profile maps to the Cards tab slot)
+  document.querySelectorAll('.bitem').forEach(b=>b.classList.toggle('sel', b.dataset.tab===name));
+  setStatusTheme(name);
+}
+function back(){
+  if(stack.length>1){ stack.pop(); go(stack[stack.length-1], true); }
+  else go('home', true);
+}
+// interactions
+function setTop(el,v){document.querySelectorAll('#topup .chip').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');document.getElementById('topAmt').value=v;}
+function seg(el,htg){document.querySelectorAll('#send .seg, [data-screen="send"] .seg').forEach(s=>{s.classList.remove('sel');s.style.background='none';s.style.color='var(--muted)';});el.classList.add('sel');el.style.background='var(--blue)';el.style.color='#fff';}
+function ftab(el){el.parentElement.querySelectorAll('.ftab').forEach(t=>t.classList.remove('sel'));el.classList.add('sel');}
+function calcX(){
+  const raw = parseFloat((document.getElementById('xFrom').value||'0').replace(/,/g,''))||0;
+  const usd = raw/203.25;
+  document.getElementById('xTo').textContent = usd.toFixed(2);
+  document.getElementById('xRecv').textContent = usd.toFixed(2)+' USD';
+}
+let toastT;
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),1600);}
+
+// transaction data
+const TX=[
+ {ic:'bolt',t:'Electricity Bill',s:'Today, 8:15 AM',a:'-1,250 HTG',cls:'neg',st:'ok',stt:'Completed'},
+ {ic:'phone',t:'Mobile Top Up',s:'Today, 9:02 AM',a:'-500 HTG',cls:'neg',st:'ok',stt:'Completed'},
+ {ic:'in',t:'Received from Marie Pierre',s:'Yesterday, 6:45 PM',a:'+3,000 HTG',cls:'pos',st:'ok',stt:'Completed'},
+ {ic:'usd',t:'USD Exchange',s:'May 18, 10:30 AM',a:'+25 USD',cls:'pos',st:'ok',stt:'Completed'},
+ {ic:'cart',t:'Supermarket Payment',s:'May 17, 5:12 PM',a:'-1,750 HTG',cls:'neg',st:'pend',stt:'Pending'},
+ {ic:'gov',t:'Government Fee',s:'May 16, 11:08 AM',a:'-2,000 HTG',cls:'neg',st:'att',stt:'Requires attention'},
+];
+const ICON={
+ bolt:'<path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/>',
+ phone:'<rect x="6" y="2" width="12" height="20" rx="2.5" stroke="currentColor" stroke-width="2" fill="none"/><path d="M11 18h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+ in:'<path d="M12 4v12m0 0l-4-4m4 4l4-4M5 20h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>',
+ usd:'<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><path d="M9.5 9a2.5 2.5 0 015 .5c0 1.5-2.5 2-2.5 3.5M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+ cart:'<path d="M5 8h14l-1 12H6L5 8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/><path d="M9 8a3 3 0 016 0" stroke="currentColor" stroke-width="2" fill="none"/>',
+ gov:'<path d="M3 9l9-5 9 5M4 9v10h16V9" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" fill="none"/>',
+};
+const inIcon={in:1,usd:1};
+function rowHTML(x,withStatus){
+  const green = x.ic==='in'||x.ic==='usd';
+  return `<div class="lrow"><div class="licon" ${green?'style="background:var(--green-bg);color:var(--green)"':''}><svg viewBox="0 0 24 24">${ICON[x.ic]}</svg></div>
+   <div class="lmain"><div class="t">${x.t}</div><div class="s">${x.s}</div></div>
+   <div style="text-align:right"><div class="lamt ${x.cls}">${x.a}</div>${withStatus?`<span class="pill ${x.st}" style="margin-top:3px">${x.st==='ok'?'✓ ':x.st==='pend'?'◔ ':'⚠ '}${x.stt}</span>`:`<div style="font-size:11px;color:${x.st==='ok'?'var(--green)':x.st==='pend'?'#C98113':'var(--red)'};margin-top:1px">${x.st==='ok'?'✓':'◔'}</div>`}</div></div>`;
+}
+document.getElementById('homeTx').innerHTML = TX.slice(0,4).map(x=>rowHTML(x,false)).join('');
+document.getElementById('allTx').innerHTML = TX.map(x=>rowHTML(x,true)).join('');
+
+// live clock
+function tick(){const d=new Date();document.getElementById('clock').textContent=d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');}
+tick();setInterval(tick,30000);
+
+go('welcome',true);
+</script>
+</body>
+</html>
