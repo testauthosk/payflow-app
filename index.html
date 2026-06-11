@@ -1121,10 +1121,13 @@ function faceID(){
     f.classList.remove('scanning'); f.classList.add('done');
     t.textContent='Face ID Recognized'; t.style.color='#2BD17E'; s.textContent='Welcome back, Jean-Baptiste';
   }, 2350);
-  setTimeout(()=>{                        // dismiss → home
+  setTimeout(()=>{                        // switch screens while overlay still covers
+    stack=['login']; go('home','fade');
+  }, 2950);
+  setTimeout(()=>{                        // dismiss overlay — home is already in place
     f.classList.remove('on');
     setTimeout(()=>{ f.className='faceid'; }, 300);
-    stack=['login']; go('home','push'); fidBusy=false;
+    fidBusy=false;
   }, 3250);
 }
 
