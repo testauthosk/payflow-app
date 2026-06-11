@@ -36,15 +36,8 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
    a duplicate clock, and clear the device safe area (notch) instead. The mock
    status bar stays only in the desktop device-frame preview. */
 @media(max-width:479px){
-  #statusbar{display:none}
-  /* Safari already places content below its bar/notch → small breathing space only */
-  .screen{padding-top:12px}
+  #statusbar{display:none}        /* OS already draws a status bar — hide ours */
   #ribbon{top:12px}
-}
-/* installed to home screen (no Safari bar) → clear the notch via safe area */
-@media(max-width:479px) and (display-mode:standalone){
-  .screen{padding-top:max(env(safe-area-inset-top),12px)}
-  #ribbon{top:max(env(safe-area-inset-top),12px)}
 }
 
 /* status bar */
@@ -55,9 +48,10 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
 .statusbar .ico{display:flex;gap:6px;align-items:center}
 .statusbar .ico svg{width:17px;height:17px}
 
-/* screen system — JS-driven native transitions (push/pop/fade) */
+/* screen system — JS-driven native transitions (push/pop/fade).
+   Mobile-first: small top padding (OS draws its own bar); desktop frame adds 50px for the mock bar. */
 .screen{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  padding-top:50px;display:none;background:var(--bg)}
+  padding-top:12px;display:none;background:var(--bg)}
 .screen.active{display:block}
 .screen.has-nav{padding-bottom:96px}
 .screen::-webkit-scrollbar{display:none}
@@ -75,6 +69,10 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
 .enter.run > [data-rise]:nth-child(5){transition-delay:.16s}
 .enter.run > [data-rise]:nth-child(6){transition-delay:.2s}
 .enter.run > [data-rise]:nth-child(n+7){transition-delay:.24s}
+/* desktop device-frame shows the mock status bar → clear it */
+@media(min-width:480px){.screen{padding-top:50px}}
+/* installed to home screen (standalone) → clear the notch via safe area */
+@media(max-width:479px) and (display-mode:standalone){.screen{padding-top:max(env(safe-area-inset-top),12px)}}
 
 .pad{padding:0 20px}
 .h-title{font-size:1.5rem;font-weight:800;letter-spacing:-.02em;color:var(--ink)}
@@ -157,17 +155,15 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
   border-top:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-around;
   padding:9px 8px env(safe-area-inset-bottom);z-index:55;box-shadow:0 -10px 30px -18px rgba(20,46,122,.3)}
 .bitem{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10.5px;font-weight:600;
-  color:#9AA4BC;cursor:pointer;flex:1;padding-top:6px}
-.bitem svg{width:23px;height:23px}
+  color:#9AA4BC;cursor:pointer;flex:1;padding-top:6px;transition:color .25s ease}
+.bitem svg{width:23px;height:23px;transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
 .bitem.sel{color:var(--blue)}
-.bitem.scan{margin-top:-22px}
-.bitem.scan .scc{width:56px;height:56px;border-radius:50%;background:var(--blue-bright);
-  display:grid;place-items:center;color:#fff;box-shadow:0 12px 24px -8px rgba(37,99,235,.7)}
-.bitem.scan .scc svg{width:26px;height:26px}
-.bitem{transition:color .25s ease}
-.bitem svg{transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
 .bitem.sel:not(.scan) svg{transform:translateY(-3px) scale(1.08)}
-.bitem.scan .scc{transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+.bitem.scan{margin-top:-22px}
+.bitem.scan .scc{width:56px;height:56px;border-radius:18px;background:var(--blue-bright);
+  display:grid;place-items:center;color:#fff;box-shadow:0 12px 24px -8px rgba(37,99,235,.7);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+.bitem.scan .scc svg{width:26px;height:26px}
 .bitem.scan:active .scc{transform:scale(.92)}
 
 /* tap feedback — spring press on interactive surfaces */
@@ -257,6 +253,18 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
 .cardstack{position:relative}
 .cardstack .peek{position:absolute;left:14px;right:14px;top:-12px;height:30px;border-radius:16px 16px 0 0;
   background:linear-gradient(135deg,#23478f,#142a66);opacity:.6;z-index:-1}
+/* horizontal card carousel (swipe) */
+.card-carousel{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;
+  margin:18px -20px 0;padding:2px 20px;scroll-padding-left:20px}
+.card-carousel::-webkit-scrollbar{display:none}
+.card-carousel > .pfcard{flex:0 0 84%;scroll-snap-align:center}
+.pfcard.ghost{background:#fff;border:2px dashed #C5D2EE;color:var(--blue);box-shadow:none;
+  display:grid;place-items:center;cursor:pointer}
+.pfcard.ghost::after,.pfcard.ghost::before{display:none}
+.mclogo{display:inline-flex;align-items:center}
+.mclogo i{width:17px;height:17px;border-radius:50%;display:block}
+.mclogo i:nth-child(1){background:#EB001B}
+.mclogo i:nth-child(2){background:#F79E1B;margin-left:-8px;mix-blend-mode:screen}
 
 /* exchange swap */
 .xbox{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px}
@@ -644,9 +652,8 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
           <div class="iconbtn" onclick="toast('Add a new card')"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
         </div>
 
-        <!-- primary card -->
-        <div class="cardstack" style="margin-top:18px">
-          <div class="peek"></div>
+        <!-- horizontal card carousel -->
+        <div class="card-carousel" id="cardCarousel" onscroll="cardDot()">
           <div class="pfcard">
             <span class="pill-cur">HTG · USD</span>
             <div class="row" style="gap:9px;align-items:center">
@@ -662,7 +669,26 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
               <div class="net">VISA</div>
             </div>
           </div>
+          <div class="pfcard usd">
+            <span class="pill-cur">USD · Virtual</span>
+            <div class="row" style="gap:9px;align-items:center">
+              <span style="display:inline-grid;place-items:center;width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.16)"><svg viewBox="0 0 24 24" width="18" height="18" fill="none"><path d="M4 17l5-10 3 6 2-4 6 8" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span style="font-weight:800;font-size:16px;letter-spacing:-.01em">PayFlow</span>
+              <svg class="contactless" style="margin-left:auto" viewBox="0 0 24 24" fill="none"><path d="M8.5 8a5 5 0 010 8M12 5a9 9 0 010 14M5 11a2.5 2.5 0 010 2" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+            </div>
+            <div class="chip" style="margin-top:20px"></div>
+            <div class="num" style="margin-top:16px">8810&nbsp;&nbsp;••••&nbsp;&nbsp;••••&nbsp;&nbsp;1190</div>
+            <div class="row between" style="margin-top:16px;align-items:flex-end">
+              <div><div class="lab">Card Holder</div><div class="val">Jean-Baptiste Louis</div></div>
+              <div><div class="lab">Valid Thru</div><div class="val">11/27</div></div>
+              <span class="mclogo"><i></i><i></i></span>
+            </div>
+          </div>
+          <div class="pfcard ghost" onclick="toast('Add a new card')">
+            <div style="text-align:center"><div style="font-size:32px;font-weight:300;line-height:1">+</div><div style="font-size:13px;font-weight:600;margin-top:6px">Add new card</div></div>
+          </div>
         </div>
+        <div class="dots" id="cardDots" style="margin-top:14px"><span class="dot on"></span><span class="dot"></span><span class="dot"></span></div>
 
         <!-- card actions -->
         <div class="cardacts">
@@ -889,6 +915,15 @@ function rowHTML(x,withStatus){
 }
 document.getElementById('homeTx').innerHTML = TX.slice(0,4).map(x=>rowHTML(x,false)).join('');
 document.getElementById('allTx').innerHTML = TX.map(x=>rowHTML(x,true)).join('');
+
+// card carousel dots
+function cardDot(){
+  var c=document.getElementById('cardCarousel'); if(!c) return;
+  var card=c.querySelector('.pfcard'); if(!card) return;
+  var step=card.offsetWidth+14;
+  var i=Math.min(Math.max(Math.round(c.scrollLeft/step),0),2);
+  document.querySelectorAll('#cardDots .dot').forEach(function(d,j){ d.classList.toggle('on',j===i); });
+}
 
 // Face ID scan → success → home
 let fidBusy=false;
