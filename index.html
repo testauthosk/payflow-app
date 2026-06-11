@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#1B3FA6">
 <title>PayFlow — Banking that moves Haiti forward</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,9 +19,11 @@
   --shadow-sm:0 6px 18px -10px rgba(20,46,122,.28);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%}
+/* lock the page: no whole-document scroll, no rubber-band overscroll, no pinch/double-tap zoom */
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;
+  touch-action:manipulation;-webkit-text-size-adjust:100%}
 body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink);
-  display:flex;align-items:center;justify-content:center;min-height:100dvh;padding:0}
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:0}
 /* desktop backdrop */
 .stage{position:fixed;inset:0;background:
   radial-gradient(1200px 600px at 50% -10%, #1f3f96 0%, transparent 55%),
@@ -41,6 +43,8 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
   /* fill the viewport top-aligned (no flex centering → no white gap above the app) */
   body{display:block}
   .phone{height:100dvh;max-height:none;border-radius:0;margin:0 auto}
+  /* coloured-header screen: header runs flush to the very top (native nav-bar look) */
+  .screen[data-screen=qr]{padding-top:0}
 }
 
 /* status bar */
@@ -53,8 +57,8 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
 
 /* screen system — JS-driven native transitions (push/pop/fade).
    Mobile-first: small top padding (OS draws its own bar); desktop frame adds 50px for the mock bar. */
-.screen{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  padding-top:12px;display:none;background:var(--bg)}
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+  overscroll-behavior:none;padding-top:12px;display:none;background:var(--bg)}
 .screen.active{display:block}
 .screen.has-nav{padding-bottom:96px}
 .screen::-webkit-scrollbar{display:none}
@@ -528,7 +532,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
 
     <!-- ============ 5. PAY WITH QR ============ -->
     <section class="screen flow" data-screen="qr">
-      <div class="appbar" style="background:var(--blue);margin:0;padding:10px 20px;color:#fff">
+      <div class="appbar" style="background:var(--blue);margin:0;padding:max(12px,env(safe-area-inset-top)) 20px 12px;color:#fff">
         <div class="iconbtn" style="background:rgba(255,255,255,.16);border:none;color:#fff" onclick="back()"><svg viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <span class="ttl" style="color:#fff">Pay with QR</span><span style="width:38px"></span>
       </div>
@@ -889,7 +893,14 @@ function go(name, mode){
   if(mode!=='pop'){ if(stack[stack.length-1]!==name) stack.push(name); }
   transition(name, mode);
 }
-function navTab(name){ stack=[name]; go(name,'fade'); }
+function navTab(name){
+  // tab switches slide horizontally by tab order (like PayerPay's track)
+  var order=['home','transactions','cards','services'];
+  var from=order.indexOf(current), to=order.indexOf(name);
+  stack=[name];
+  if(from<0||to<0||from===to){ transition(name,'fade'); return; }
+  transition(name, to>from ? 'push' : 'pop');
+}
 function back(){
   if(stack.length>1){ stack.pop(); transition(stack[stack.length-1],'pop'); }
   else transition('home','pop');
@@ -1002,6 +1013,15 @@ function faceID(){
 // live clock
 function tick(){const d=new Date();document.getElementById('clock').textContent=d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');}
 tick();setInterval(tick,30000);
+
+// block pinch-zoom & double-tap zoom — native-app feel, page can't be scaled/dragged
+document.addEventListener('gesturestart',function(e){ e.preventDefault(); },{passive:false});
+document.addEventListener('gesturechange',function(e){ e.preventDefault(); },{passive:false});
+document.addEventListener('touchmove',function(e){ if(e.touches&&e.touches.length>1) e.preventDefault(); },{passive:false});
+var _lastTap=0;
+document.addEventListener('touchend',function(e){
+  var now=Date.now(); if(now-_lastTap<=300) e.preventDefault(); _lastTap=now;
+},{passive:false});
 
 // init
 setChrome('welcome');
