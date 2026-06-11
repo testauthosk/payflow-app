@@ -1,0 +1,11 @@
+{
+  "name": "payflow-app",
+  "version": "1.0.0",
+  "description": "PayFlow — Haiti mobile banking app UI",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

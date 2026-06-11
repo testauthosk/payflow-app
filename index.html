@@ -41,13 +41,26 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
 .statusbar .ico{display:flex;gap:6px;align-items:center}
 .statusbar .ico svg{width:17px;height:17px}
 
-/* screen system */
+/* screen system — JS-driven native transitions (push/pop/fade) */
 .screen{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  padding-top:50px;display:none;animation:fade .32s ease both}
+  padding-top:50px;display:none;background:var(--bg)}
 .screen.active{display:block}
 .screen.has-nav{padding-bottom:96px}
-@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .screen::-webkit-scrollbar{display:none}
+/* dim overlay used during slide parallax */
+.screen::after{content:"";position:fixed;inset:0;background:#0b1430;opacity:0;pointer-events:none;
+  transition:opacity .42s cubic-bezier(.32,.72,0,1);z-index:40}
+.screen.dimmed::after{opacity:.16}
+/* content enter: gentle stagger of marked blocks */
+.enter > [data-rise]{opacity:0;transform:translateY(14px)}
+.enter.run > [data-rise]{opacity:1;transform:none;
+  transition:opacity .5s cubic-bezier(.22,1,.36,1),transform .5s cubic-bezier(.22,1,.36,1)}
+.enter.run > [data-rise]:nth-child(2){transition-delay:.04s}
+.enter.run > [data-rise]:nth-child(3){transition-delay:.08s}
+.enter.run > [data-rise]:nth-child(4){transition-delay:.12s}
+.enter.run > [data-rise]:nth-child(5){transition-delay:.16s}
+.enter.run > [data-rise]:nth-child(6){transition-delay:.2s}
+.enter.run > [data-rise]:nth-child(n+7){transition-delay:.24s}
 
 .pad{padding:0 20px}
 .h-title{font-size:1.5rem;font-weight:800;letter-spacing:-.02em;color:var(--ink)}
@@ -137,6 +150,17 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
 .bitem.scan .scc{width:56px;height:56px;border-radius:50%;background:var(--blue-bright);
   display:grid;place-items:center;color:#fff;box-shadow:0 12px 24px -8px rgba(37,99,235,.7)}
 .bitem.scan .scc svg{width:26px;height:26px}
+.bitem{transition:color .25s ease}
+.bitem svg{transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+.bitem.sel:not(.scan) svg{transform:translateY(-3px) scale(1.08)}
+.bitem.scan .scc{transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+.bitem.scan:active .scc{transform:scale(.92)}
+
+/* tap feedback — spring press on interactive surfaces */
+.lrow.tap,.scard,.qbtn,.btn,.chip,.ftab,.iconbtn,.curtag,.seg,.card.tap{
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1),background .2s,box-shadow .25s,color .2s,border-color .2s}
+.lrow.tap:active,.card.tap:active{transform:scale(.985);background:var(--soft)}
+.chip:active,.ftab:active,.curtag:active{transform:scale(.95)}
 
 /* logo mark */
 .mark{display:inline-flex;align-items:center;gap:9px}
@@ -336,8 +360,8 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
 
         <div class="balance" style="margin-top:13px">
           <div class="row between">
-            <div><div class="lab">HTG Balance</div><div class="big">23,450<span class="cur">HTG</span></div></div>
-            <div style="text-align:right"><div class="lab">USD Balance</div><div class="big">245.80<span class="cur">USD</span></div></div>
+            <div><div class="lab">HTG Balance</div><div class="big"><span id="balHTG">23,450</span><span class="cur">HTG</span></div></div>
+            <div style="text-align:right"><div class="lab">USD Balance</div><div class="big"><span id="balUSD">245.80</span><span class="cur">USD</span></div></div>
           </div>
           <div class="row between" style="margin-top:14px">
             <span class="pill ver" style="background:rgba(255,255,255,.16);color:#fff"><svg viewBox="0 0 24 24" fill="none" style="width:13px;height:13px"><path d="M5 12l4 4 10-10" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>Verified Account</span>
@@ -557,11 +581,11 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
 
     <!-- ===== BOTTOM NAV ===== -->
     <nav class="bnav" id="bnav" style="display:none">
-      <div class="bitem" data-tab="home" onclick="go('home')"><svg viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7M5 10v10h5v-6h4v6h5V10" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Home</div>
-      <div class="bitem" data-tab="transactions" onclick="go('transactions')"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M3 9h18" stroke="currentColor" stroke-width="2"/></svg>Accounts</div>
-      <div class="bitem scan" data-tab="qr" onclick="go('qr')"><span class="scc"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7V5a1 1 0 011-1h2M4 17v2a1 1 0 001 1h2M20 7V5a1 1 0 00-1-1h-2M20 17v2a1 1 0 01-1 1h-2M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>Scan</div>
-      <div class="bitem" data-tab="cards" onclick="go('profile')"><svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M2 10h20M6 15h4" stroke="currentColor" stroke-width="2"/></svg>Cards</div>
-      <div class="bitem" data-tab="services" onclick="go('services')"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>More</div>
+      <div class="bitem" data-tab="home" onclick="navTab('home')"><svg viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7M5 10v10h5v-6h4v6h5V10" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Home</div>
+      <div class="bitem" data-tab="transactions" onclick="navTab('transactions')"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M3 9h18" stroke="currentColor" stroke-width="2"/></svg>Accounts</div>
+      <div class="bitem scan" data-tab="qr" onclick="go('qr','push')"><span class="scc"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7V5a1 1 0 011-1h2M4 17v2a1 1 0 001 1h2M20 7V5a1 1 0 00-1-1h-2M20 17v2a1 1 0 01-1 1h-2M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>Scan</div>
+      <div class="bitem" data-tab="profile" onclick="navTab('profile')"><svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M2 10h20M6 15h4" stroke="currentColor" stroke-width="2"/></svg>Cards</div>
+      <div class="bitem" data-tab="services" onclick="navTab('services')"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>More</div>
     </nav>
 
     <div class="toast" id="toast"></div>
@@ -570,29 +594,88 @@ body{font-family:'Inter',system-ui,sans-serif;background:#0b1430;color:var(--ink
 
 <script>
 const TAB_SCREENS = ['home','transactions','services','profile']; // bottom nav only here
-const BLUE_BAR = []; // status bar region always sits over light bg
 let stack = ['welcome'];
+let current = 'welcome';
+let animating = false;
+const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+const EASE = 'cubic-bezier(.32,.72,0,1)', DUR = 430;
 
-function setStatusTheme(name){
-  const sb = document.getElementById('statusbar');
-  sb.classList.toggle('on-blue', BLUE_BAR.includes(name));
-}
-function go(name, isBack){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  const el = document.querySelector('[data-screen="'+name+'"]');
-  if(!el) return;
-  el.classList.add('active'); el.scrollTop = 0;
-  if(!isBack && stack[stack.length-1]!==name) stack.push(name);
-  // bottom nav only on the four tab destinations (sub-flows use back button)
+function el(name){ return document.querySelector('[data-screen="'+name+'"]'); }
+function setChrome(name){
   document.getElementById('bnav').style.display = TAB_SCREENS.includes(name) ? 'flex' : 'none';
   document.getElementById('ribbon').style.display = name==='welcome' ? 'block':'none';
-  // nav active state (profile maps to the Cards tab slot)
   document.querySelectorAll('.bitem').forEach(b=>b.classList.toggle('sel', b.dataset.tab===name));
-  setStatusTheme(name);
 }
+function afterEnter(scr,name){
+  scr.scrollTop = 0;
+  if(name==='home') countBalances();
+}
+
+/* core transition: mode = push | pop | fade | instant */
+function transition(name, mode){
+  if(name===current || animating) { if(name===current) return; }
+  const incoming = el(name), outgoing = el(current);
+  if(!incoming) return;
+  setChrome(name);
+  if(reduce || mode==='instant' || !outgoing){
+    if(outgoing){ outgoing.classList.remove('active'); outgoing.style.cssText=''; }
+    incoming.classList.add('active'); incoming.style.cssText='';
+    current=name; afterEnter(incoming,name); return;
+  }
+  animating = true;
+  incoming.classList.add('active');
+  incoming.style.transition='none'; outgoing.style.transition='none';
+  incoming.style.willChange='transform,opacity'; outgoing.style.willChange='transform,opacity';
+  // start state
+  if(mode==='push'){ incoming.style.transform='translateX(100%)'; incoming.style.opacity='1'; outgoing.style.zIndex='1'; incoming.style.zIndex='2'; }
+  else if(mode==='pop'){ incoming.style.transform='translateX(-24%)'; incoming.style.opacity='1'; incoming.classList.add('dimmed'); outgoing.style.zIndex='2'; incoming.style.zIndex='1'; }
+  else { incoming.style.transform='scale(.985)'; incoming.style.opacity='0'; }
+  void incoming.offsetWidth; // reflow
+  const tr = `transform ${DUR}ms ${EASE}, opacity ${DUR}ms ${EASE}`;
+  incoming.style.transition=tr; outgoing.style.transition=tr;
+  // end state
+  if(mode==='push'){ incoming.style.transform='translateX(0)'; outgoing.style.transform='translateX(-24%)'; outgoing.classList.add('dimmed'); }
+  else if(mode==='pop'){ incoming.style.transform='translateX(0)'; incoming.classList.remove('dimmed'); outgoing.style.transform='translateX(100%)'; }
+  else { incoming.style.transform='none'; incoming.style.opacity='1'; outgoing.style.opacity='0'; }
+  const done = ()=>{
+    outgoing.classList.remove('active','dimmed');
+    [incoming,outgoing].forEach(s=>{ s.style.cssText=''; });
+    incoming.classList.add('active');
+    animating=false; afterEnter(incoming,name);
+  };
+  setTimeout(done, DUR+30);
+  current=name;
+}
+
+function go(name, mode){
+  // default intent: deeper = push; tab switch = fade
+  if(!mode){
+    if(TAB_SCREENS.includes(name) && TAB_SCREENS.includes(current)) mode='fade';
+    else mode='push';
+  }
+  if(mode!=='pop'){ if(stack[stack.length-1]!==name) stack.push(name); }
+  transition(name, mode);
+}
+function navTab(name){ stack=[name]; go(name,'fade'); }
 function back(){
-  if(stack.length>1){ stack.pop(); go(stack[stack.length-1], true); }
-  else go('home', true);
+  if(stack.length>1){ stack.pop(); transition(stack[stack.length-1],'pop'); }
+  else transition('home','pop');
+}
+
+/* balance count-up */
+function animNum(node, target, dur, fmt){
+  const start=performance.now();
+  function step(t){ let p=Math.min((t-start)/dur,1); p=1-Math.pow(1-p,3);
+    node.textContent=fmt(target*p); if(p<1) requestAnimationFrame(step); else node.textContent=fmt(target); }
+  requestAnimationFrame(step);
+}
+let balDone=false;
+function countBalances(){
+  const htg=document.getElementById('balHTG'), usd=document.getElementById('balUSD');
+  if(!htg||!usd) return;
+  if(reduce){ htg.textContent='23,450'; usd.textContent='245.80'; return; }
+  animNum(htg,23450,900,v=>Math.round(v).toLocaleString('en-US'));
+  animNum(usd,245.80,900,v=>v.toFixed(2));
 }
 // interactions
 function setTop(el,v){document.querySelectorAll('#topup .chip').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');document.getElementById('topAmt').value=v;}
@@ -638,7 +721,8 @@ document.getElementById('allTx').innerHTML = TX.map(x=>rowHTML(x,true)).join('')
 function tick(){const d=new Date();document.getElementById('clock').textContent=d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');}
 tick();setInterval(tick,30000);
 
-go('welcome',true);
+// init
+setChrome('welcome');
 </script>
 </body>
 </html>
